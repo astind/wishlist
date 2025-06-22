@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
 
+  let { form } = $props();
 </script>
 
 <div>
@@ -15,7 +17,7 @@
     <div class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
       <div class="card-body">
         <fieldset class="fieldset">
-          <form action="?/login" method="post">
+          <form action="?/login" method="post" use:enhance>
             <label class="label" for="email">Username</label>
             <input type="email" class="input" id="email" placeholder="Email" />
             <label class="label mt-2" for="pw">Password</label>
