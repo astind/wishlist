@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import type { Actions, PageServerLoad } from './$types';
-import { user } from '$lib/server/db/schema/user';
+import { userTable } from '$lib/server/db/schema/user';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
@@ -29,7 +29,7 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid password (min 6, max 255 characters)' });
 		}
 
-		const results = await db.select().from(user).where(eq(user.username, username));
+		const results = await db.select().from(userTable).where(eq(userTable.username, username));
 
 		const existingUser = results.at(0);
 		if (!existingUser) {
@@ -74,7 +74,7 @@ export const actions: Actions = {
 		});
 
 		try {
-			await db.insert(user).values({ id: userId, username, passwordHash });
+			await db.insert(userTable).values({ id: userId, username, passwordHash });
 
 			const sessionToken = auth.generateSessionToken();
 			const session = await auth.createSession(sessionToken, userId);
