@@ -14,7 +14,7 @@
           <a href="/home" aria-current={page.url.pathname === '/home'}>Home</a>
         </li>
         <li>
-          <a href="/login" aria-current={page.url.pathname === '/login'}>Login</a>
+          <a href="/search" aria-current={page.url.pathname === '/search'}>Search</a>
         </li>
         <li>
           <a href="/demo" aria-current={page.url.pathname === '/demo'}>Demo</a>
@@ -34,7 +34,7 @@
         <a href="/home" aria-current={page.url.pathname === '/home'}>Home</a>
       </li>
       <li>
-        <a href="/login" aria-current={page.url.pathname === '/login'}>Login</a>
+        <a href="/search" aria-current={page.url.pathname === '/search'}>Search</a>
       </li>
       <li>
         <a href="/demo" aria-current={page.url.pathname === '/demo'}>Demo</a>

@@ -1,8 +1,8 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, text, integer, primaryKey } from 'drizzle-orm/pg-core';
-import { wishlist } from './wishlist';
+import { wishlistTable } from './wishlist';
 
-export const user = pgTable('user', {
+export const userTable = pgTable('user', {
 	id: text('id').primaryKey(),
 	username: text('username').notNull().unique(),
 	passwordHash: text('password_hash').notNull()
@@ -10,18 +10,18 @@ export const user = pgTable('user', {
 
 // add: groups, sharedwishlists
 
-export const userRelations = relations(user, ({many}) => ({
-	wishlists: many(wishlist),
-	friends: many(friends)
+export const userTableRelations = relations(userTable , ({many}) => ({
+	wishlists: many(wishlistTable),
+	friends: many(friendsTable)
 }));
 
-export const friends = pgTable('friends', {
-	userId: integer('user_id').notNull().references(() => user.id),
-	friendId: integer('friend_id').notNull().references(() => user.id),	
+export const friendsTable = pgTable('friends', {
+	userId: integer('user_id').notNull().references(() => userTable.id),
+	friendId: integer('friend_id').notNull().references(() => userTable.id),	
 	},
 	(t) => [
 		primaryKey({ columns: [t.userId, t.friendId] })
 	],
 );
 
-export type User = typeof user.$inferSelect;
+export type User = typeof userTable.$inferSelect;

@@ -1,31 +1,31 @@
 import { boolean, integer, pgTable, primaryKey, serial, smallint, text } from "drizzle-orm/pg-core";
-import { user } from "./user";
+import { userTable } from "./user";
 import { relations } from "drizzle-orm";
-import { wishlistItemRelation, wishlistItem } from "./wishlist-item";
-import { groupLists } from "./group";
+import { wishlistItemTable } from "./wishlist-item";
+import { groupListsTable } from "./group";
 
-export const wishlist = pgTable('wishlist', {
+export const wishlistTable = pgTable('wishlist', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   rank: smallint('rank').notNull().default(0),
-  ownerId: integer('owner_id').references(() => user.id),
+  ownerId: integer('owner_id').references(() => userTable.id),
   private: boolean('private').notNull().default(true),
   description: text('description'),
 });
 
-export const wishlistRelations = relations(wishlist,({one, many}) => ({
-  owner: one(user, {
-    fields: [wishlist.ownerId],
-    references: [user.id],
+export const wishlistTableRelations = relations(wishlistTable,({one, many}) => ({
+  owner: one(userTable, {
+    fields: [wishlistTable.ownerId],
+    references: [userTable.id],
   }),
-  items: many(wishlistItem),
-  groups: many(groupLists),
-  shared: many(sharedLists),
+  items: many(wishlistItemTable),
+  groups: many(groupListsTable),
+  shared: many(sharedListsTable),
 }));
 
-export const sharedLists = pgTable('shared_lists', {
-    wishlistId: integer('wishlist_id').notNull().references(() => wishlist.id),
-    userId: integer('user_id').notNull().references(() => user.id),
+export const sharedListsTable = pgTable('shared_lists', {
+    wishlistId: integer('wishlist_id').notNull().references(() => wishlistTable.id),
+    userId: integer('user_id').notNull().references(() => userTable.id),
   }, (t) => [
       primaryKey({ columns: [t.userId, t.wishlistId ] })
    ]
