@@ -1,4 +1,4 @@
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions, PageServerLoad, RequestEvent } from './$types';
 import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async (event) => {
@@ -10,13 +10,16 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
   login: login,
+  register: register
 }
 
 
-async function login({request}) {
+async function login(event: RequestEvent) {
   
 }
 
-async function register({request}) {
-  
+async function register(event: RequestEvent) {
+  const form = await event.request.formData();
+  const username = form.get('username');
+  const pw = form.get('password');
 }

@@ -1,4 +1,4 @@
-import { decimal, pgTable, serial, text, integer, smallint, boolean, date } from "drizzle-orm/pg-core";
+import { decimal, pgTable, serial, text, integer, smallint, boolean, date, timestamp } from "drizzle-orm/pg-core";
 import { wishlistTable } from "./wishlist";
 import { relations } from "drizzle-orm";
 
@@ -14,7 +14,8 @@ export const wishlistItemTable = pgTable('wishlist_item', {
   bought: boolean('bought').notNull().default(false),
   hideWhenBought: boolean('hide_on_buy').notNull().default(true),
   showDate: date('show_date'),
-  autoDelete: boolean('auto_delete').notNull().default(false)
+  autoDelete: boolean('auto_delete').notNull().default(false),
+  dateAdded: timestamp().defaultNow(),
 });
 
 export const wishlistItemRelation = relations(wishlistItemTable, ({one}) => ({
@@ -24,4 +25,4 @@ export const wishlistItemRelation = relations(wishlistItemTable, ({one}) => ({
   }),
 }));
 
-export type WishlistItem = typeof wishlistItem.$inferSelect;
+export type WishlistItem = typeof wishlistItemTable.$inferSelect;
