@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
 
   let { form } = $props();
+
 </script>
 
 <div>
@@ -18,10 +19,10 @@
       <div class="card-body">
         <fieldset class="fieldset">
           <form action="?/login" method="post" use:enhance>
-            <label class="label" for="email">Username</label>
-            <input type="email" class="input" id="email" placeholder="Email" />
-            <label class="label mt-2" for="pw">Password</label>
-            <input id="pw" type="password" class="input" placeholder="Password" />
+            <label class="label" for="username">Username</label>
+            <input class="input" id="username" name="username" placeholder="Username" required/>
+            <label class="label mt-2" for="password">Password</label>
+            <input id="password" type="password" name="password" class="input" placeholder="Password" required/>
             <div class="mt-2">
               <a class="link link-hover" href="/help">
                 Forgot password?
@@ -29,10 +30,11 @@
             </div>
             <div class="flex mt-2 space-x-4">
               <button class="btn btn-neutral">Login</button>
-              <button class="btn" formaction="?/register">Register</button>
+              <button class="btn btn-neutral" formaction="?/register">Register</button>
             </div> 
           </form>
-        </fieldset>
+        </fieldset>  
+        <p style="color: red">{form?.message ?? ''}</p>
       </div>
     </div>
   </div>
