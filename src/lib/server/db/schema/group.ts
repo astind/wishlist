@@ -6,7 +6,7 @@ import { wishlistTable } from "./wishlist";
 export const groupTable = pgTable('group', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
-  ownerId: integer('owner_id').notNull().references(() => userTable.id),
+  ownerId: text('owner_id').notNull().references(() => userTable.id),
   description: text('description'),
   private: boolean('private').notNull().default(true),
 });
@@ -22,7 +22,7 @@ export const groupTableRelations = relations(groupTable, ({one, many}) => ({
 
 export const groupMembersTable = pgTable('group_members', {
     groupId: integer('group_id').notNull().references(() => groupTable.id),
-    memberId: integer('member_id').notNull().references(() => userTable.id),
+    memberId: text('member_id').notNull().references(() => userTable.id),
   }, (t) => [
     primaryKey({columns: [t.groupId, t.memberId] })
   ]

@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, text, integer, primaryKey } from 'drizzle-orm/pg-core';
+import { pgTable, text, primaryKey } from 'drizzle-orm/pg-core';
 import { wishlistTable } from './wishlist';
 
 export const userTable = pgTable('user', {
@@ -16,8 +16,8 @@ export const userTableRelations = relations(userTable , ({many}) => ({
 }));
 
 export const friendsTable = pgTable('friends', {
-	userId: integer('user_id').notNull().references(() => userTable.id),
-	friendId: integer('friend_id').notNull().references(() => userTable.id),	
+	userId: text('user_id').notNull().references(() => userTable.id),
+	friendId: text('friend_id').notNull().references(() => userTable.id),	
 	},
 	(t) => [
 		primaryKey({ columns: [t.userId, t.friendId] })

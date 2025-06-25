@@ -8,19 +8,19 @@ import { db } from '$lib/server/db';
 import { userTable } from '$lib/server/db/schema/user';
 
 export const load: PageServerLoad = async (event) => {
-  if (event.locals.user) {
-    return redirect(302, '/home');
-  }
-  return {};
-}
+	if (event.locals.user) {
+		return redirect(302, '/home');
+	}
+	return {};
+};
 
 export const actions: Actions = {
-  login: login,
-  register: register
-}
+	login: login,
+	register: register
+};
 
 async function login(event: RequestEvent) {
-  const formData = await event.request.formData();
+	const formData = await event.request.formData();
 	const username = formData.get('username');
 	const password = formData.get('password');
 
@@ -58,7 +58,7 @@ async function login(event: RequestEvent) {
 }
 
 async function register(event: RequestEvent) {
-  const formData = await event.request.formData();
+	const formData = await event.request.formData();
 	const username = formData.get('username');
 	const password = formData.get('password');
 
@@ -85,6 +85,7 @@ async function register(event: RequestEvent) {
 		const session = await auth.createSession(sessionToken, userId);
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 	} catch (e) {
+		console.log(e);
 		return fail(500, { message: 'An error has occurred' });
 	}
 	return redirect(302, '/home');

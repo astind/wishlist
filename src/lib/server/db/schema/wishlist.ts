@@ -8,7 +8,7 @@ export const wishlistTable = pgTable('wishlist', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   rank: smallint('rank').notNull().default(0),
-  ownerId: integer('owner_id').references(() => userTable.id),
+  ownerId: text('owner_id').references(() => userTable.id),
   private: boolean('private').notNull().default(true),
   description: text('description'),
 });
@@ -25,7 +25,7 @@ export const wishlistTableRelations = relations(wishlistTable,({one, many}) => (
 
 export const sharedListsTable = pgTable('shared_lists', {
     wishlistId: integer('wishlist_id').notNull().references(() => wishlistTable.id),
-    userId: integer('user_id').notNull().references(() => userTable.id),
+    userId: text('user_id').notNull().references(() => userTable.id),
   }, (t) => [
       primaryKey({ columns: [t.userId, t.wishlistId ] })
    ]
