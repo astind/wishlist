@@ -1,4 +1,4 @@
-import { boolean, integer, pgTable, primaryKey, serial, smallint, text } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, primaryKey, serial, smallint, text, timestamp, unique } from "drizzle-orm/pg-core";
 import { userTable } from "./user";
 import { relations } from "drizzle-orm";
 import { wishlistItemTable } from "./wishlist-item";
@@ -11,7 +11,10 @@ export const wishlistTable = pgTable('wishlist', {
   ownerId: text('owner_id').references(() => userTable.id),
   private: boolean('private').notNull().default(true),
   description: text('description'),
-});
+  dateCreated: timestamp().defaultNow()
+}, (t) => [
+    unique('list_name').on(t.id, t.name)
+  ]);
 
 export const wishlistTableRelations = relations(wishlistTable,({one, many}) => ({
   owner: one(userTable, {

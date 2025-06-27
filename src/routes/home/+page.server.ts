@@ -22,6 +22,28 @@ export const actions: Actions = {
 		auth.deleteSessionTokenCookie(event);
 
 		return redirect(302, '/');
+	},
+	new: async (event) => {
+		const form = await event.request.formData();
+		const name = form.get('name');
+		const description = form.get('description');
+		let checkPrivate = form.get('private');
+		const isPrivate = checkPrivate !== null && checkPrivate === 'on';
+		try {
+			await db.insert(wishlistTable).values({
+				name: name,
+				description: description,
+				private: isPrivate,
+				ownerId: event.locals.user?.id,
+			});
+		} catch (e) {
+			console.log(e);
+			let message = "Failed to create new wishlist";
+			if (e.message) {
+				message = e.message;
+			}
+			return fail(500, {message: message});
+		}
 	}
 };
 
@@ -47,3 +69,5 @@ async function getWishlists(userId: string) {
 	}
 	return wishlists;
 }
+
+

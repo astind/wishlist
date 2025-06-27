@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
+	import { fly, slide } from 'svelte/transition';
 
-  let {data} = $props();
+  let {data, form} = $props();
 
   let newOpen = $state(false);
-  let isPrivate = $state(false)
   
   function openNew() {
     newOpen = true;
@@ -12,7 +12,9 @@
 
   function cancelNew() {
     newOpen = false;
-    isPrivate = false;
+    if (form) {
+      form.message = null;
+    }
   }
 </script>
 
@@ -30,25 +32,34 @@
   </div>
 
   {#if newOpen}
-  	<div class="flex justify-center">
-  	  <form action="?/new" method="post" use:enhance>
+  	<div in:slide out:slide class="flex justify-center">
+  	  <form action="?/new" method="post" use:enhance={() => {
+  	      return async ({update}) => {
+  	        await update();
+  	          
+  	        newOpen = false;
+  	      }
+  	    }}>
   	    <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
           <legend class="fieldset-legend">New Wishlist</legend>
   
             <label class="label" for="name">Name</label>
-            <input type="text" class="input" placeholder="Name" name="name" id="name"/>
+            <input type="text" class="input" placeholder="Name" name="name" id="name" required/>
   
             <label class="label" for="description">Description</label>
             <textarea class="textarea" placeholder="Description" id="description" name="description"></textarea>
   
-            <label class="label">
-              <input type="checkbox" class="checkbox" bind:checked={isPrivate}/>
+            <label class="label mt-2">
+              <input type="checkbox" class="checkbox" name="private"/>
               Private
             </label>
             <div class="flex justify-end space-x-4">
               <button class="btn btn-primary">Save</button>
               <button class="btn btn-error" onclick={cancelNew}>Cancel</button>
             </div>
+            {#if form?.message}
+              <p class="mt-4">{form.message}</p>
+            {/if}
         </fieldset>
   	  </form>
   	</div>
@@ -56,13 +67,13 @@
 
   <ul class="list bg-base-100 rounded-box shadow-md mt-8">
     {#each data.wishlists as list}
-    	<li class="list-row">
+    	<li class="list-row" in:fly={{y: 20}} out:slide>
         <div></div>
         <div>
           <div>{list.name}</div>
           <div class="text-xs font-semibold opacity-60">{list.description}</div>
         </div>
-        <a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/wishlist">
+        <a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/wishlist/{list.id}">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
           </svg>
@@ -74,9 +85,7 @@
           
         </button>
       </li>
-    {/each}
-     
-         
+    {/each}          
   </ul>
   
   <div class="flex justify-end mt-8">

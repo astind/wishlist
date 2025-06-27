@@ -1,4 +1,4 @@
-import { decimal, pgTable, serial, text, integer, smallint, boolean, date, timestamp } from "drizzle-orm/pg-core";
+import { decimal, pgTable, serial, text, integer, smallint, boolean, date, timestamp, unique } from "drizzle-orm/pg-core";
 import { wishlistTable } from "./wishlist";
 import { relations } from "drizzle-orm";
 
@@ -16,7 +16,11 @@ export const wishlistItemTable = pgTable('wishlist_item', {
   showDate: date('show_date'),
   autoDelete: boolean('auto_delete').notNull().default(false),
   dateAdded: timestamp().defaultNow(),
-});
+},
+  (t) => [
+    unique('item_name').on(t.id, t.name)
+  ]
+);
 
 export const wishlistItemRelation = relations(wishlistItemTable, ({one}) => ({
   wishlist: one(wishlistTable, {
