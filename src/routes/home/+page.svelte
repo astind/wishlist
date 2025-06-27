@@ -2,6 +2,18 @@
 	import { enhance } from '$app/forms';
 
   let {data} = $props();
+
+  let newOpen = $state(false);
+  let isPrivate = $state(false)
+  
+  function openNew() {
+    newOpen = true;
+  }
+
+  function cancelNew() {
+    newOpen = false;
+    isPrivate = false;
+  }
 </script>
 
 
@@ -14,8 +26,33 @@
   </div>
 
   <div class="flex justify-end">
-    <button class="btn btn-primary">New Wishlist</button>
+    <button class="btn btn-primary" onclick={openNew}>New Wishlist</button>
   </div>
+
+  {#if newOpen}
+  	<div class="flex justify-center">
+  	  <form action="?/new" method="post" use:enhance>
+  	    <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+          <legend class="fieldset-legend">New Wishlist</legend>
+  
+            <label class="label" for="name">Name</label>
+            <input type="text" class="input" placeholder="Name" name="name" id="name"/>
+  
+            <label class="label" for="description">Description</label>
+            <textarea class="textarea" placeholder="Description" id="description" name="description"></textarea>
+  
+            <label class="label">
+              <input type="checkbox" class="checkbox" bind:checked={isPrivate}/>
+              Private
+            </label>
+            <div class="flex justify-end space-x-4">
+              <button class="btn btn-primary">Save</button>
+              <button class="btn btn-error" onclick={cancelNew}>Cancel</button>
+            </div>
+        </fieldset>
+  	  </form>
+  	</div>
+  {/if}
 
   <ul class="list bg-base-100 rounded-box shadow-md mt-8">
     {#each data.wishlists as list}
