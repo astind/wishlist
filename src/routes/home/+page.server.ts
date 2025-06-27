@@ -2,12 +2,12 @@ import * as auth from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
-import { asc, eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { wishlistTable } from '$lib/server/db/schema';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) {
-		return redirect(302, '/login');
+		return redirect(302, '/');
 	}
 	const wishlists = await getWishlists(event.locals.user.id);
 	return { user: event.locals.user, wishlists: wishlists };
@@ -22,31 +22,8 @@ export const actions: Actions = {
 		auth.deleteSessionTokenCookie(event);
 
 		return redirect(302, '/');
-	},
-	new: async (event) => {
-		const form = await event.request.formData();
-		const name = form.get('name');
-		const description = form.get('description');
-		let checkPrivate = form.get('private');
-		const isPrivate = checkPrivate !== null && checkPrivate === 'on';
-		try {
-			await db.insert(wishlistTable).values({
-				name: name,
-				description: description,
-				private: isPrivate,
-				ownerId: event.locals.user?.id,
-			});
-		} catch (e) {
-			console.log(e);
-			let message = "Failed to create new wishlist";
-			if (e.message) {
-				message = e.message;
-			}
-			return fail(500, {message: message});
-		}
 	}
 };
-
 
 async function getWishlists(userId: string) {
 	let wishlists: any[] = []; // TODO: Change to a type
@@ -58,16 +35,15 @@ async function getWishlists(userId: string) {
 				description: true
 			},
 			where: eq(wishlistTable.ownerId, userId),
-			orderBy: [asc(wishlistTable.rank)]
+			orderBy: [desc(wishlistTable.lastUpdated), desc(wishlistTable.dateCreated)],
+			limit: 5
 		});
 		if (results.length) {
 			wishlists = results;
 		}
-	}	catch(e) {
+	} catch (e) {
 		// TODO: Fail and a message?
-		console.log(e);		
+		console.log(e);
 	}
 	return wishlists;
 }
-
-
