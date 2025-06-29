@@ -108,7 +108,7 @@
 						</form>
 					{/if}
 				</div>
-				<a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/wishlist/{list.id}">
+				<a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/lists/{list.id}">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
