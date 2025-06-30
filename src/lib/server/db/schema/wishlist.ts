@@ -26,7 +26,7 @@ export const wishlistTable = pgTable(
 		dateCreated: timestamp().defaultNow(),
 		lastUpdated: timestamp()
 	},
-	(t) => [unique('list_name').on(t.id, t.name)]
+	(t) => [unique('list_name').on(t.ownerId, t.name)]
 );
 
 export const wishlistTableRelations = relations(wishlistTable, ({ one, many }) => ({

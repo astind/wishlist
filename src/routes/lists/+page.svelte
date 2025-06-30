@@ -38,9 +38,11 @@
 				action="?/new"
 				method="post"
 				use:enhance={() => {
-					return async ({ update }) => {
+					return async ({ update, result }) => {
 						await update();
-						newOpen = false;
+						if (result.type === 'success') {
+							newOpen = false;
+						}
 					};
 				}}
 			>
@@ -63,7 +65,7 @@
 						<button type="button" class="btn btn-error" onclick={cancelNew}>Cancel</button>
 					</div>
 					{#if form?.message}
-						<p class="mt-4">{form.message}</p>
+						<p class="mt-4 text-error">{form.message}</p>
 					{/if}
 				</fieldset>
 			</form>
@@ -108,7 +110,7 @@
 						</form>
 					{/if}
 				</div>
-				<a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/lists/{list.id}">
+				<a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/lists/{list.name}">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"

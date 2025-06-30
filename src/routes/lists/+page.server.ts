@@ -32,6 +32,7 @@ export const actions: Actions = {
 			if (e.message) {
 				message = e.message;
 			}
+			console.log(message);
 			return fail(500, { message: message });
 		}
 	},

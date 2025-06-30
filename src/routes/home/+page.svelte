@@ -22,7 +22,7 @@
 						<div class="text-xs font-semibold opacity-60">{list.description}</div>
 					{/if}
 				</div>
-				<a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/lists/{list.id}">
+				<a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/lists/{list.name}">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
