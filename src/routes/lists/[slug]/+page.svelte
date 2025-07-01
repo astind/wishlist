@@ -18,6 +18,20 @@
 			form.message = '';
 		}
 	}
+
+	function openEditItem(index: number) {
+		if (deleteIndex >= 0) {
+			deleteIndex = -1;
+		}
+		editIndex = index;
+	}
+
+	function openDeleteItem(index: number) {
+		if (editIndex >= 0) {
+			editIndex = -1
+		}
+		deleteIndex = index;
+	}
 </script>
 
 <div>
@@ -42,6 +56,7 @@
 			>
 				<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-md border p-4">
 					<legend class="fieldset-legend">New List Item</legend>
+					<input type="hidden" name="wishlistId" value={data.list.id}>
 					<label class="label" for="name">Name*</label>
 					<input
 						class="input w-full"
@@ -88,7 +103,7 @@
 	</div>
 
 	<ul class="list bg-base-100 rounded-box shadow-md mt-4">
-		{#each data.list.items as item}
+		{#each data.list.items as item, index}
 			<li class="list-row" in:fly={{ y: 20 }} out:slide>
 				<div>
 					{#if item.iconLink}
@@ -104,14 +119,91 @@
 						</div>
 					{/if}
 				</div>
-
-				{#if item.description}
-					<p class="list-col-wrap">{item.description}</p>
-				{/if}
+				<div class="list-col-wrap">
+					{#if item.description}
+						<p>{item.description}</p>
+          {/if}
+					{#if deleteIndex === index}
+            <form class="mt-2 flex items-center" in:slide out:slide action="?/deleteItem" method="post" use:enhance={() => {
+            	return async ({update, result}) => {
+            		if (result.type === 'success') {
+            			deleteIndex = -1;
+            		}
+            		await update();
+            	}
+            }}>
+            	<div>
+            		<input type="hidden" name="name" value={item.name}/>
+            		<input type="hidden" name="wishlistId" value={data.list.id}/>	
+            		Are you sure you want to delete this item?
+            	</div>
+            	<div class="ml-4">
+            		<button type="button" class="btn btn-accent" onclick={() => deleteIndex = -1}>Cancel</button>
+            		<button type="submit" class="btn btn-error">Delete</button>
+            	</div>
+            </form>
+          {/if}
+          {#if editIndex === index}
+          	<form action="?/editItem" method="post" in:slide out:slide use:enhance={() => {
+          		return async ({result, update}) => {
+          			if (result.type === 'success') {
+          				editIndex = -1;
+          			}
+          			await update();
+          		}
+          	}}>
+          		<fieldset class="flex flex-col mx-auto fieldset bg-base-200 border-base-300 rounded-box w-md border p-4">
+								<legend class="fieldset-legend">Edit Item</legend>
+								<input type="hidden" name="wishlistId" value={data.list.id}/>
+								<input type="hidden" name="ogName" value={item.name}/>
+								<label class="label" for="name">Name*</label>
+								<input
+									class="input w-full"
+									type="text"
+									id="name"
+									name="name"
+									placeholder="Name"
+									value={item.name}
+									required
+								/>
+								<label class="label" for="link">URL/Link</label>
+								<input class="input w-full" type="text" id="link" name="link" placeholder="Link" value={item.url} />
+								<label for="description" class="label">Description</label>
+								<textarea
+									class="textarea w-full"
+									placeholder="Description"
+									id="description"
+									name="description"
+									value={item.description}
+								></textarea>
+								<label for="price" class="label">Price</label>
+								<div class="input w-full">
+									$
+									<input type="number" class="grow" placeholder="Price" name="price" step="0.01" value={item.price}/>
+								</div>
+								<label class="label mt-2">
+									<input type="checkbox" class="checkbox" name="autoDelete" checked={item.autoDelete}/>
+									Auto Delete Item if bought
+								</label>
+								<div class="flex justify-end space-x-4 mt-2">
+									<button class="btn btn-accent" type="submit">Save</button>
+									<button class="btn btn-error" type="button" onclick={() => editIndex = -1}>Cancel</button>
+								</div>
+								{#if form?.message}
+									<p class="mt-4 text-error">
+										{form.message}
+									</p>
+								{/if}
+							</fieldset>
+          	</form>
+          {/if}		
+        </div>
 				<div class="flex items-center text-xl">
-					${item.price}
+					{#if item.price}
+          	${item.price}
+          {/if}
 				</div>
-				<button aria-label="Edit Item" class="btn btn-square btn-ghost">
+				<button aria-label="Edit Item" onclick={() => openEditItem(index)} class="btn btn-square btn-ghost">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
@@ -127,7 +219,7 @@
 						/>
 					</svg>
 				</button>
-				<button aria-label="Delete Item" class="btn btn-square btn-ghost">
+				<button aria-label="Delete Item" onclick={() => openDeleteItem(index)} class="btn btn-square btn-ghost">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
