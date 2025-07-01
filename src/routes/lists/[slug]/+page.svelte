@@ -114,8 +114,8 @@
 					<div class="text-lg">{item.name}</div>
 
 					{#if item.url}
-						<div class="text-sm">
-							<a class="link" href={item.url}>{item.url}</a>
+						<div class="text-sm truncate text-ellipsis w-80">
+							<a rel="external" class="link" href={item.url} target="_blank">{item.url}</a>
 						</div>
 					{/if}
 				</div>
