@@ -69,7 +69,6 @@ async function register(event: RequestEvent) {
 		return fail(400, { message: 'Invalid password' });
 	}
 
-	const userId = generateUserId();
 	const passwordHash = await hash(password, {
 		// recommended minimum parameters
 		memoryCost: 19456,
@@ -79,8 +78,8 @@ async function register(event: RequestEvent) {
 	});
 
 	try {
-		await db.insert(userTable).values({ id: userId, username, passwordHash });
-
+		const res = await db.insert(userTable).values({ username, passwordHash }).returning({generatedId: userTable.id});
+		const userId = res[0].generatedId;
 		const sessionToken = auth.generateSessionToken();
 		const session = await auth.createSession(sessionToken, userId);
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
@@ -91,12 +90,12 @@ async function register(event: RequestEvent) {
 	return redirect(302, '/home');
 }
 
-function generateUserId() {
-	// ID with 120 bits of entropy, or about the same as UUID v4.
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}
+// function generateUserId() {
+// 	// ID with 120 bits of entropy, or about the same as UUID v4.
+// 	const bytes = crypto.getRandomValues(new Uint8Array(15));
+// 	const id = encodeBase32LowerCase(bytes);
+// 	return id;
+// }
 
 function validateUsername(username: unknown): username is string {
 	return (

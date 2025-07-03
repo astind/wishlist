@@ -31,9 +31,6 @@
 				<li>
 					<a href="/groups" aria-current={page.url.pathname === '/groups'}>Groups</a>
 				</li>
-				<li>
-					<a href="/friends" aria-current={page.url.pathname === '/friends'}>Friends</a>
-				</li>
 			</ul>
 		</div>
 	</div>
@@ -53,9 +50,6 @@
 			</li>
 			<li>
 				<a href="/groups" aria-current={page.url.pathname === '/groups'}>Groups</a>
-			</li>
-			<li>
-				<a href="/friends" aria-current={page.url.pathname === '/friends'}>Friends</a>
 			</li>
 		</ul>
 	</div>

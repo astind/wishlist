@@ -43,15 +43,10 @@
 	</ul>
 
 	<div class="flex items-center justify-between mt-8">
-		<h2 class="text-xl font-semibold">Groups:</h2>
+		<h2 class="text-xl font-semibold">My Groups:</h2>
 		<a class="btn btn-primary" href="/groups">My Groups</a>
 	</div>
-
-	<div class="flex items-center justify-between mt-8">
-		<h2 class="text-xl font-semibold">Friends:</h2>
-		<a class="btn btn-primary" href="/friends">My Friends</a>
-	</div>
-
+	
 	<div class="flex justify-end mt-8">
 		<form action="?/logout" method="post" use:enhance>
 			<button class="btn btn-secondary">Logout</button>

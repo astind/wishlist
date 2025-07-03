@@ -7,7 +7,8 @@ import {
 	boolean,
 	date,
 	timestamp,
-	primaryKey
+	primaryKey,
+    uuid
 } from 'drizzle-orm/pg-core';
 import { wishlistTable } from './wishlist';
 import { relations } from 'drizzle-orm';
@@ -21,7 +22,7 @@ export const wishlistItemTable = pgTable(
 		iconLink: text('icon_link'),
 		price: decimal('price'),
 		description: text('description'),
-		wishlistId: integer('wishlist_id').references(() => wishlistTable.id),
+		wishlistId: uuid('wishlist_id').references(() => wishlistTable.id),
 		bought: boolean('bought').notNull().default(false),
 		hideWhenBought: boolean('hide_on_buy').notNull().default(true),
 		showDate: date('show_date'),

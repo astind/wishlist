@@ -1,14 +1,14 @@
-import { boolean, integer, pgTable, primaryKey, serial, text } from "drizzle-orm/pg-core";
+import { integer, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
 import { userTable } from './user';
 import { relations } from "drizzle-orm";
 import { wishlistTable } from "./wishlist";
 
 export const groupTable = pgTable('group', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  ownerId: text('owner_id').notNull().references(() => userTable.id),
+  id: uuid().defaultRandom().primaryKey(),
+  name: text('name').notNull().unique(),
+  ownerId: uuid('owner_id').notNull().references(() => userTable.id),
   description: text('description'),
-  private: boolean('private').notNull().default(true),
+  groupPassword: text('group_password')
 });
 
 export const groupTableRelations = relations(groupTable, ({one, many}) => ({
@@ -21,16 +21,16 @@ export const groupTableRelations = relations(groupTable, ({one, many}) => ({
 }));
 
 export const groupMembersTable = pgTable('group_members', {
-    groupId: integer('group_id').notNull().references(() => groupTable.id),
-    memberId: text('member_id').notNull().references(() => userTable.id),
+    groupId: uuid('group_id').notNull().references(() => groupTable.id),
+    memberId: uuid('member_id').notNull().references(() => userTable.id),
   }, (t) => [
     primaryKey({columns: [t.groupId, t.memberId] })
   ]
 );
 
 export const groupListsTable = pgTable('group_lists', {
-    groupId: integer('group_id').notNull().references(() => groupTable.id),
-    listId: integer('list_id').notNull().references(() => wishlistTable.id),
+    groupId: uuid('group_id').notNull().references(() => groupTable.id),
+    listId: uuid('list_id').notNull().references(() => wishlistTable.id),
   }, (t) => [
     primaryKey({columns: [t.groupId, t.listId] })
   ]
