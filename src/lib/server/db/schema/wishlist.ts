@@ -50,3 +50,14 @@ export const sharedListsTable = pgTable('shared_lists',{
 		primaryKey({ columns: [t.userId, t.wishlistId] })
 	]
 );
+
+export const sharedListRelations = relations(sharedListsTable, ({one}) => ({
+	user: one(userTable, {
+		fields: [sharedListsTable.userId],
+		references: [userTable.id]
+	}),
+	list: one(wishlistTable, {
+		fields: [sharedListsTable.wishlistId],
+		references: [wishlistTable.id]
+	})
+}));

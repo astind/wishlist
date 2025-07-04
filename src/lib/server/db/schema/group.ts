@@ -28,6 +28,17 @@ export const groupMembersTable = pgTable('group_members', {
   ]
 );
 
+export const groupMembersRelations = relations(groupMembersTable, ({one}) => ({
+  group: one(groupTable, {
+    fields: [groupMembersTable.groupId],
+    references: [groupTable.id]
+  }),
+  user: one(userTable, {
+    fields: [groupMembersTable.memberId],
+    references: [userTable.id]
+  })
+}));
+
 export const groupListsTable = pgTable('group_lists', {
     groupId: uuid('group_id').notNull().references(() => groupTable.id),
     listId: uuid('list_id').notNull().references(() => wishlistTable.id),
@@ -35,3 +46,15 @@ export const groupListsTable = pgTable('group_lists', {
     primaryKey({columns: [t.groupId, t.listId] })
   ]
 );
+
+export const groupListsRelations = relations(groupListsTable, ({one}) => ({
+  group: one(groupTable, {
+    fields: [groupListsTable.groupId],
+    references: [groupTable.id]
+  }),
+  list: one(wishlistTable, {
+    fields: [groupListsTable.listId],
+    references: [wishlistTable.id]
+  })
+}));
+

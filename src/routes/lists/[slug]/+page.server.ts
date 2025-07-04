@@ -1,4 +1,4 @@
-import { fail, redirect, type Actions, type RequestEvent } from '@sveltejs/kit';
+import { error, fail, redirect, type Actions, type RequestEvent } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { and, eq } from 'drizzle-orm';
@@ -10,8 +10,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	}
 	let slug = params.slug;
 	const list = await getList(slug, locals.user.id);
+	console.log(list)
 	if (!list) {
-		return redirect(401, '/lists');
+		return error(404, {message: "List not found"});
 	}
 	return { list: list };
 };
@@ -21,11 +22,13 @@ async function getList(listName: string, userId: string) {
 		const list = await db.query.wishlistTable.findFirst({
 			where: and(eq(wishlistTable.name, listName), eq(wishlistTable.ownerId, userId)),
 			with: {
-				items: true
+				items: true,
+				shared: true
 			}
 		});
 		return list;
 	} catch (e: any) {
+		console.error(e);
 		return null;
 	}
 }

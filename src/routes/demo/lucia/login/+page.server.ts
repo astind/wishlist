@@ -29,8 +29,17 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid password (min 6, max 255 characters)' });
 		}
 
-		const results = await db.select().from(userTable).where(eq(userTable.username, username));
-
+		let results;
+		try {
+			results = await db.select().from(userTable).where(eq(userTable.username, username));
+		} catch (e: any) {
+			let message = "Cannot connect to database";
+			if (e.message) {
+				message = e.message;
+			}
+			console.log(e);
+			return fail(500, {message: message})
+		}
 		const existingUser = results.at(0);
 		if (!existingUser) {
 			return fail(400, { message: 'Incorrect username or password' });
