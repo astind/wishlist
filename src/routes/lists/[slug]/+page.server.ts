@@ -23,7 +23,8 @@ async function getList(listName: string, userId: string) {
 			where: and(eq(wishlistTable.name, listName), eq(wishlistTable.ownerId, userId)),
 			with: {
 				items: true,
-				shared: true
+				shared: true,
+				groups: true
 			}
 		});
 		return list;

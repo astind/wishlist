@@ -45,6 +45,10 @@
 		if (modal) {
 			modal.close();
 		}
+		const radio = document.getElementById('list-settings-radio');
+		if (radio) {
+			radio.checked = true;
+		}
 	}
 </script>
 
@@ -70,6 +74,7 @@
 	<dialog id="list-settings-modal" class="modal">
 		<div class="modal-box">
 			<h3 class="text-lg font-bold">{data.list.name} Settings:</h3>
+			<input type="radio" name="list-settings" hidden id="list-settings-radio" checked>
 			<div class="collapse collapse-arrow bg-base-200 border-base-300 border mt-4">
 				<input type="radio" name="list-settings"/>
  				<div class="collapse-title font-semibold">List Details</div>
@@ -98,12 +103,26 @@
 				<input type="radio" name="list-settings"/>
 				<div class="collapse-title font-semibold">List Groups</div>
 				<div class="collapse-content">
-					<p>
-						This is list has been shared to
-					</p>
+					{#if data.list.groups.length}
+						
+					{:else}
+          	List has not been shared to any groups
+          {/if}
 				</div>
 			</div>
 
+			<div class="collapse collapse-arrow bg-base-200 border-base-300 border mt-4">
+				<input type="radio" name="list-settings"/>
+				<div class="collapse-title font-semibold">Shared Users:</div>
+				<div class="collapse-content">
+					{#if data.list.shared.length}
+						
+					{:else}
+          	List has not been shared with any users
+          {/if}
+				</div>
+			</div>
+			
 			<div class="modal-action">
 				<button class="btn" type="button" onclick={closeSettings}>Close</button>
 			</div>
