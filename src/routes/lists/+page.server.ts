@@ -1,56 +1,51 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
-import { asc, desc, eq } from 'drizzle-orm';
-import { wishlistTable } from '$lib/server/db/schema';
+import { deleteWishlist, getWishlists, newWishlist } from '$lib/server/lists';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) {
 		return redirect(302, '/login');
 	}
-	const wishlists = await getWishlists(event.locals.user.id);
-	return { user: event.locals.user, wishlists: wishlists };
+	let lists = [];
+	try{
+		lists = await getWishlists(event.locals.user.id);
+	}
+	catch (e: any) {
+		return error(404, {message: e});
+	}
+	return { user: event.locals.user, wishlists: lists };
 };
 
 export const actions: Actions = {
 	new: async (event) => {
 		const form = await event.request.formData();
-		const name = form.get('name');
-		const description = form.get('description');
+		const name = form.get('name') as string | null;
+		if (!name) {
+			return fail(404, {message: "Missing name field"})
+		}
+		const description = form.get('description') as string | null;
 		const checkPrivate = form.get('private');
 		const isPrivate = checkPrivate !== null && checkPrivate === 'on';
+		if (!event.locals.user) {
+			return fail(404, {message: "Missing User"});
+		}
 		try {
-			await db.insert(wishlistTable).values({
-				name: name,
-				description: description,
-				private: isPrivate,
-				ownerId: event.locals.user?.id
-			});
+			newWishlist(name as string, event.locals.user.id, description || undefined, isPrivate);
 		} catch (e: any) {
-			console.log(e);
-			let message = 'Failed to create new wishlist';
-			if (e.message) {
-				message = e.message;
-			}
-			console.log(message);
-			return fail(500, { message: message });
+			return fail(500, { message: e });
 		}
 	},
 	delete: async (event) => {
 		const form = await event.request.formData();
 		const formId = form.get('id');
+		if (!event.locals.user) {
+			return fail(404, {message: "Missing User"});
+		}
 		if (formId) {
-			const listId = +formId;
-			console.log(formId);
 			try {
-				await db.delete(wishlistTable).where(eq(wishlistTable.id, listId));
+				deleteWishlist(formId as string, event.locals.user.id);
 			} catch (e: any) {
-				console.log(e);
-				let message = 'Failed to delete wishlist';
-				if (e.message) {
-					message = e.message;
-				}
-				return fail(500, { message: message });
+				return fail(500, { message: e });
 			}
 		} else {
 			return fail(404, { message: 'Missing wishlist ID' });
@@ -58,24 +53,3 @@ export const actions: Actions = {
 	}
 };
 
-async function getWishlists(userId: string) {
-	let wishlists: any[] = []; // TODO: Change to a type
-	try {
-		const results = await db.query.wishlistTable.findMany({
-			columns: {
-				id: true,
-				name: true,
-				description: true
-			},
-			where: eq(wishlistTable.ownerId, userId),
-			orderBy: [asc(wishlistTable.rank), desc(wishlistTable.dateCreated)]
-		});
-		if (results.length) {
-			wishlists = results;
-		}
-	} catch (e) {
-		// TODO: Fail and a message?
-		console.log(e);
-	}
-	return wishlists;
-}

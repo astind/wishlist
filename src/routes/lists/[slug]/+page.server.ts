@@ -3,36 +3,22 @@ import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { and, eq } from 'drizzle-orm';
 import { wishlistItemTable, wishlistTable } from '$lib/server/db/schema';
+import { getList } from '$lib/server/lists';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!locals.user) {
 		return redirect(302, '/');
 	}
-	let slug = params.slug;
-	const list = await getList(slug, locals.user.id);
-	console.log(list)
-	if (!list) {
-		return error(404, {message: "List not found"});
+	let listname = params.slug;
+	let list
+	try {
+		list = await getList(listname, locals.user.id);
+	}
+	catch (e: any) {
+		return error(404, {message: e});
 	}
 	return { list: list };
 };
-
-async function getList(listName: string, userId: string) {
-	try {
-		const list = await db.query.wishlistTable.findFirst({
-			where: and(eq(wishlistTable.name, listName), eq(wishlistTable.ownerId, userId)),
-			with: {
-				items: true,
-				shared: true,
-				groups: true
-			}
-		});
-		return list;
-	} catch (e: any) {
-		console.error(e);
-		return null;
-	}
-}
 
 function getFormData(form: FormData, key: string) {
 	if (form.get(key)) {

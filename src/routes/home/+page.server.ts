@@ -1,16 +1,20 @@
 import * as auth from '$lib/server/auth';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
-import { desc, eq } from 'drizzle-orm';
-import { wishlistTable } from '$lib/server/db/schema';
+import { getWishlists } from '$lib/server/lists';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) {
 		return redirect(302, '/');
 	}
-	const wishlists = await getWishlists(event.locals.user.id);
-	return { user: event.locals.user, wishlists: wishlists };
+	let lists = [];
+	try{
+		lists = await getWishlists(event.locals.user.id, 5, true);
+	} 
+	catch (e: any) {
+		return error(404, {message: e})
+	}
+	return { user: event.locals.user, wishlists: lists };
 };
 
 export const actions: Actions = {
@@ -23,26 +27,3 @@ export const actions: Actions = {
 		return redirect(302, '/');
 	}
 };
-
-async function getWishlists(userId: string) {
-	let wishlists: any[] = []; // TODO: Change to a type
-	try {
-		const results = await db.query.wishlistTable.findMany({
-			columns: {
-				id: true,
-				name: true,
-				description: true
-			},
-			where: eq(wishlistTable.ownerId, userId),
-			orderBy: [desc(wishlistTable.lastUpdated), desc(wishlistTable.dateCreated)],
-			limit: 5
-		});
-		if (results.length) {
-			wishlists = results;
-		}
-	} catch (e) {
-		// TODO: Fail and a message?
-		console.log(e);
-	}
-	return wishlists;
-}
