@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, text, uuid } from 'drizzle-orm/pg-core';
-import { sharedListsTable, wishlistTable } from './wishlist';
+import { sharedListsTable, listTable } from './list';
 import { groupMembersTable } from './group';
 
 export const userTable = pgTable('user', {
@@ -10,7 +10,7 @@ export const userTable = pgTable('user', {
 });
 
 export const userTableRelations = relations(userTable , ({many}) => ({
-	wishlists: many(wishlistTable),
+	lists: many(listTable),
 	groups: many(groupMembersTable),
 	shared: many(sharedListsTable)
 }));

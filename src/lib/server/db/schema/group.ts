@@ -1,7 +1,7 @@
 import { integer, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
 import { userTable } from './user';
 import { relations } from "drizzle-orm";
-import { wishlistTable } from "./wishlist";
+import { listTable } from "./list";
 
 export const groupTable = pgTable('group', {
   id: uuid().defaultRandom().primaryKey(),
@@ -41,7 +41,7 @@ export const groupMembersRelations = relations(groupMembersTable, ({one}) => ({
 
 export const groupListsTable = pgTable('group_lists', {
     groupId: uuid('group_id').notNull().references(() => groupTable.id),
-    listId: uuid('list_id').notNull().references(() => wishlistTable.id),
+    listId: uuid('list_id').notNull().references(() => listTable.id),
   }, (t) => [
     primaryKey({columns: [t.groupId, t.listId] })
   ]
@@ -52,9 +52,9 @@ export const groupListsRelations = relations(groupListsTable, ({one}) => ({
     fields: [groupListsTable.groupId],
     references: [groupTable.id]
   }),
-  list: one(wishlistTable, {
+  list: one(listTable, {
     fields: [groupListsTable.listId],
-    references: [wishlistTable.id]
+    references: [listTable.id]
   })
 }));
 

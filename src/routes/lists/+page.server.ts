@@ -1,6 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { deleteWishlist, getWishlists, newWishlist } from '$lib/server/lists';
+import { deleteList, getLists, newList } from '$lib/server/lists';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) {
@@ -8,12 +8,12 @@ export const load: PageServerLoad = async (event) => {
 	}
 	let lists = [];
 	try{
-		lists = await getWishlists(event.locals.user.id);
+		lists = await getLists(event.locals.user.id);
 	}
 	catch (e: any) {
 		return error(404, {message: e});
 	}
-	return { user: event.locals.user, wishlists: lists };
+	return { user: event.locals.user, lists: lists };
 };
 
 export const actions: Actions = {
@@ -30,7 +30,7 @@ export const actions: Actions = {
 			return fail(404, {message: "Missing User"});
 		}
 		try {
-			newWishlist(name as string, event.locals.user.id, description || undefined, isPrivate);
+			newList(name as string, event.locals.user.id, description || undefined, isPrivate);
 		} catch (e: any) {
 			return fail(500, { message: e });
 		}
@@ -43,12 +43,12 @@ export const actions: Actions = {
 		}
 		if (formId) {
 			try {
-				deleteWishlist(formId as string, event.locals.user.id);
+				deleteList(formId as string, event.locals.user.id);
 			} catch (e: any) {
 				return fail(500, { message: e });
 			}
 		} else {
-			return fail(404, { message: 'Missing wishlist ID' });
+			return fail(404, { message: 'Missing list ID' });
 		}
 	}
 };

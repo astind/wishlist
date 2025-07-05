@@ -1,39 +1,39 @@
 import { db } from '$lib/server/db';
 import { and, asc, desc, eq } from 'drizzle-orm';
-import { wishlistTable } from '$lib/server/db/schema';
+import { listTable } from '$lib/server/db/schema';
 
 
-export async function getWishlists(ownerId: string, limit?: number, orderByRecent: boolean = false) {
-  let wishlists: any[] = [];
+export async function getLists(ownerId: string, limit?: number, orderByRecent: boolean = false) {
+  let lists: any[] = [];
 	try {
-	  let orderBy = [asc(wishlistTable.rank), desc(wishlistTable.dateCreated)];
+	  let orderBy = [asc(listTable.rank), desc(listTable.dateCreated)];
 	  if (orderByRecent) {
-	    orderBy = [desc(wishlistTable.lastUpdated), desc(wishlistTable.dateCreated)];
+	    orderBy = [desc(listTable.lastUpdated), desc(listTable.dateCreated)];
 	  }
-		const results = await db.query.wishlistTable.findMany({
+		const results = await db.query.listTable.findMany({
 			columns: {
 				id: true,
 				name: true,
 				description: true
 			},
-			where: eq(wishlistTable.ownerId, ownerId),
+			where: eq(listTable.ownerId, ownerId),
 			orderBy: orderBy,
 			limit: limit
 		});
 		if (results.length) {
-			wishlists = results;
+			lists = results;
 		}
 	} catch (e) {
     console.error(e);
 	  let message = "Failed to get lists"
 		throw message;
 	}
-	return wishlists;
+	return lists;
 }
 
-export async function newWishlist(name: string, ownerId: string, description?: string, isPrivate: boolean = false) {
+export async function newList(name: string, ownerId: string, description?: string, isPrivate: boolean = false) {
   try {
-    await db.insert(wishlistTable).values({
+    await db.insert(listTable).values({
       name: name,
       ownerId: ownerId,
       description: description,
@@ -45,16 +45,16 @@ export async function newWishlist(name: string, ownerId: string, description?: s
   }
 }
 
-export async function updateWishlist(listId: string, name: string, ownerId: string, description?: string, isPrivate: boolean = false) {
+export async function updateList(listId: string, name: string, ownerId: string, description?: string, isPrivate: boolean = false) {
   try {
-    await db.update(wishlistTable).set({
+    await db.update(listTable).set({
       name: name, 
       description: description,
       private: isPrivate
     }).where(
       and(
-        eq(wishlistTable.ownerId, ownerId),  
-        eq(wishlistTable.id, listId)
+        eq(listTable.ownerId, ownerId),  
+        eq(listTable.id, listId)
       )
     )
   }
@@ -63,12 +63,12 @@ export async function updateWishlist(listId: string, name: string, ownerId: stri
   }
 }
 
-export async function deleteWishlist(listId: string, ownerId: string) {
+export async function deleteList(listId: string, ownerId: string) {
   try {
-    await db.delete(wishlistTable).where(
+    await db.delete(listTable).where(
       and(
-        eq(wishlistTable.id, listId),
-        eq(wishlistTable.ownerId, ownerId)
+        eq(listTable.id, listId),
+        eq(listTable.ownerId, ownerId)
       )
     );
   }
@@ -80,8 +80,8 @@ export async function deleteWishlist(listId: string, ownerId: string) {
 
 export async function getList(listName: string, ownerId: string) {
   try{
-    const list = await db.query.wishlistTable.findFirst({
-      where: and(eq(wishlistTable.name, listName), eq(wishlistTable.ownerId, ownerId)),
+    const list = await db.query.listTable.findFirst({
+      where: and(eq(listTable.name, listName), eq(listTable.ownerId, ownerId)),
       with: {
         items: true,
         shared: true,
@@ -96,8 +96,29 @@ export async function getList(listName: string, ownerId: string) {
   }
 }
 
-export async function newListItem() {
-  
+export type ListItemFields = {
+  name: string;
+  description?: string;
+  url?: string;
+  price?: number | string;
+  autoDelete: boolean;
+}
+
+export async function newListItem(listItems: ListItemFields[], ownerId: string, listId: string) {
+  try {
+    const list = await db.query.listTable.findFirst({
+      columns: { ownerId: true, id: true},
+      where: eq(listTable.id, listId)
+    });
+    if (list?.ownerId === ownerId){
+      
+    } else {
+      throw "User does not own list";
+    }
+  }
+  catch(e: any) {
+    
+  }
 }
 
 export async function editListItem() {

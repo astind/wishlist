@@ -22,7 +22,7 @@
 	<h2 class="text-xl font-semibold mt-8">Your Recent Lists:</h2>
 	
 	<ul class="list bg-base-100 rounded-box shadow-md mt-4">
-		{#each data.wishlists as list}
+		{#each data.lists as list}
 			<li class="list-row">
 				<div></div>
 				<div class="flex flex-col justify-center">
@@ -31,7 +31,7 @@
 						<div class="text-xs font-semibold opacity-60">{list.description}</div>
 					{/if}
 				</div>
-				<a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/lists/{list.name}">
+				<a class="btn btn-square btn-ghost" aria-label="Edit list" href="/lists/{list.name}">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"

@@ -77,7 +77,7 @@
 	</div>
 
 	<ul class="list bg-base-100 rounded-box shadow-md mt-4">
-		{#each data.wishlists as list}
+		{#each data.lists as list}
 			<li class="list-row" in:fly={{ y: 20 }} out:slide>
 				<div></div>
 				<div class="flex flex-col justify-center">
@@ -110,7 +110,7 @@
 						</form>
 					{/if}
 				</div>
-				<a class="btn btn-square btn-ghost" aria-label="Edit Wishlist" href="/lists/{list.name}">
+				<a class="btn btn-square btn-ghost" aria-label="Edit list" href="/lists/{list.name}">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
@@ -128,7 +128,7 @@
 				</a>
 				<button
 					class="btn btn-square btn-ghost"
-					aria-label="Delete Wishlist"
+					aria-label="Delete list"
 					onclick={() => verifyDelete(list.id)}
 				>
 					<svg

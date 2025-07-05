@@ -150,7 +150,7 @@
 			>
 				<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-md border p-4">
 					<legend class="fieldset-legend">New List Item</legend>
-					<input type="hidden" name="wishlistId" value={data.list.id}>
+					<input type="hidden" name="listId" value={data.list.id}>
 					<label class="label" for="name">Name*</label>
 					<input
 						class="input w-full"
@@ -201,7 +201,7 @@
 			<li class="list-row" in:fly={{ y: 20 }} out:slide>
 				<div>
 					{#if item.iconLink}
-						<img src={item.iconLink} alt="wishlist item" />
+						<img src={item.iconLink} alt="list item" />
 					{/if}
 				</div>
 				<div class="flex flex-col justify-center">
@@ -228,7 +228,7 @@
             }}>
             	<div>
             		<input type="hidden" name="name" value={item.name}/>
-            		<input type="hidden" name="wishlistId" value={data.list.id}/>	
+            		<input type="hidden" name="listId" value={data.list.id}/>	
             		Are you sure you want to delete this item?
             	</div>
             	<div class="ml-4">
@@ -248,7 +248,7 @@
           	}}>
           		<fieldset class="flex flex-col mx-auto fieldset bg-base-200 border-base-300 rounded-box w-md border p-4">
 								<legend class="fieldset-legend">Edit Item</legend>
-								<input type="hidden" name="wishlistId" value={data.list.id}/>
+								<input type="hidden" name="listId" value={data.list.id}/>
 								<input type="hidden" name="ogName" value={item.name}/>
 								<label class="label" for="name">Name*</label>
 								<input

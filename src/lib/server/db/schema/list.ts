@@ -10,11 +10,11 @@ import {
 } from 'drizzle-orm/pg-core';
 import { userTable } from './user';
 import { relations } from 'drizzle-orm';
-import { wishlistItemTable } from './wishlist-item';
+import { listItemTable } from './list-item';
 import { groupListsTable } from './group';
 
-export const wishlistTable = pgTable(
-	'wishlist',
+export const listTable = pgTable(
+	'list',
 	{
 		id: uuid().defaultRandom().primaryKey(),
 		name: text('name').notNull(),
@@ -29,25 +29,25 @@ export const wishlistTable = pgTable(
 	(t) => [unique('list_name').on(t.ownerId, t.name)]
 );
 
-export const wishlistTableRelations = relations(wishlistTable, ({ one, many }) => ({
+export const listTableRelations = relations(listTable, ({ one, many }) => ({
 	owner: one(userTable, {
-		fields: [wishlistTable.ownerId],
+		fields: [listTable.ownerId],
 		references: [userTable.id]
 	}),
-	items: many(wishlistItemTable),
+	items: many(listItemTable),
 	groups: many(groupListsTable),
 	shared: many(sharedListsTable)
 }));
 
 export const sharedListsTable = pgTable('shared_lists',{
-	wishlistId: uuid('wishlist_id')
+	listId: uuid('list_id')
 		.notNull()
-		.references(() => wishlistTable.id),
+		.references(() => listTable.id),
 	userId: uuid('user_id')
 		.notNull()
 		.references(() => userTable.id)
 },(t) => [
-		primaryKey({ columns: [t.userId, t.wishlistId] })
+		primaryKey({ columns: [t.userId, t.listId] })
 	]
 );
 
@@ -56,8 +56,8 @@ export const sharedListRelations = relations(sharedListsTable, ({one}) => ({
 		fields: [sharedListsTable.userId],
 		references: [userTable.id]
 	}),
-	list: one(wishlistTable, {
-		fields: [sharedListsTable.wishlistId],
-		references: [wishlistTable.id]
+	list: one(listTable, {
+		fields: [sharedListsTable.listId],
+		references: [listTable.id]
 	})
 }));

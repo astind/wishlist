@@ -2,7 +2,7 @@ import { error, fail, redirect, type Actions, type RequestEvent } from '@sveltej
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { and, eq } from 'drizzle-orm';
-import { wishlistItemTable, wishlistTable } from '$lib/server/db/schema';
+import { listItemTable, listTable } from '$lib/server/db/schema';
 import { getList } from '$lib/server/lists';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -37,23 +37,23 @@ async function updateItem(event: RequestEvent, newItem: boolean = true) {
 	const price = getFormData(form, 'price');
 	const description = getFormData(form, 'description');
 	const autoDelete = form.get('autoDelete') !== null && form.get('autoDelete') === 'on';
-	const listId = getFormData(form, 'wishlistId');
+	const listId = getFormData(form, 'listId');
 	if (!listId) {
 		return fail(400, { message: 'List Id is missing' });
 	}
 	const ogName = getFormData(form, 'ogName');
 	try {
 		if (newItem) {
-			await db.insert(wishlistItemTable).values({
+			await db.insert(listItemTable).values({
 				name: name,
 				description: description,
 				url: url,
 				price: price,
-				wishlistId: listId,
+				listId: listId,
 				autoDelete: autoDelete
 			});	
 		} else {
-			await db.update(wishlistItemTable).set({
+			await db.update(listItemTable).set({
 				name: name,
 				description: description,
 				url: url,
@@ -61,8 +61,8 @@ async function updateItem(event: RequestEvent, newItem: boolean = true) {
 				autoDelete: autoDelete
 			}).where(
 				and(
-					eq(wishlistItemTable.name, ogName), 
-					eq(wishlistItemTable.wishlistId, listId)
+					eq(listItemTable.name, ogName), 
+					eq(listItemTable.listId, listId)
 				)
 			)
 		}
@@ -78,15 +78,15 @@ async function updateItem(event: RequestEvent, newItem: boolean = true) {
 async function deleteItem(event: RequestEvent) {
 	const form = await event.request.formData();
 	const name = getFormData(form, 'name');
-	const listId = getFormData(form, 'wishlistId');
+	const listId = getFormData(form, 'listId');
 	if (!name || !listId) {
 		fail(400, {message: "Missing name and list ID"});
 	}
 	try {
-		await db.delete(wishlistItemTable).where(
+		await db.delete(listItemTable).where(
 			and(
-				eq(wishlistItemTable.name, name),
-				eq(wishlistItemTable.wishlistId, listId)
+				eq(listItemTable.name, name),
+				eq(listItemTable.listId, listId)
 			)
 		);
 	} catch (e: any) {

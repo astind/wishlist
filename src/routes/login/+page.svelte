@@ -11,7 +11,7 @@
     <div class="text-center lg:text-left">
       <h1 class="text-5xl font-bold">Login/Register</h1>
       <p class="py-6">
-        Login to access your wishlists. Register to start building your lists.
+        Login to access your lists. Register to start building your lists.
         All you need is a username and password.        
       </p>
     </div>
