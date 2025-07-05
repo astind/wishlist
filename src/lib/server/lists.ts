@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { and, asc, desc, eq } from 'drizzle-orm';
-import { listTable } from '$lib/server/db/schema';
+import { listItemTable, listTable } from '$lib/server/db/schema';
 
 
 export async function getLists(ownerId: string, limit?: number, orderByRecent: boolean = false) {
@@ -50,7 +50,8 @@ export async function updateList(listId: string, name: string, ownerId: string, 
     await db.update(listTable).set({
       name: name, 
       description: description,
-      private: isPrivate
+      private: isPrivate,
+      lastUpdated: new Date();
     }).where(
       and(
         eq(listTable.ownerId, ownerId),  
@@ -104,28 +105,77 @@ export type ListItemFields = {
   autoDelete: boolean;
 }
 
-export async function newListItem(listItems: ListItemFields[], ownerId: string, listId: string) {
+async function updateListTimestamp(ownerId: string, listId: string) {
+  try {
+    db.update(listTable).set({lastUpdated: new Date()}).where(
+      and(
+        eq(listTable.id, listId),
+        eq(listTable.ownerId, ownerId)
+      )
+    )
+  }
+  catch(e: any) {
+    console.error(e);
+    console.error("Last updated date not updated");
+  }
+}
+
+async function verifyListOwner(ownerId: string, listId: string) {
   try {
     const list = await db.query.listTable.findFirst({
       columns: { ownerId: true, id: true},
       where: eq(listTable.id, listId)
     });
-    if (list?.ownerId === ownerId){
-      
-    } else {
-      throw "User does not own list";
+    if (list?.id !== ownerId) {
+      throw "wrong owner"
     }
   }
   catch(e: any) {
-    
+    console.error(e);
+    throw "Cannot verify list owner";
   }
 }
 
-export async function editListItem() {
+export async function newListItem(listItems: ListItemFields[], ownerId: string, listId: string) {
+  verifyListOwner(ownerId, listId);
+  try { 
+    await db.insert(listItemTable).values(listItems as any);
+  }
+  catch(e: any) {
+    console.error(e);
+    throw "Failed to add item(s) to list";
+  }
+  updateListTimestamp(ownerId, listId);
   
 }
 
-export async function deleteListItem() {
-  
+export async function editListItem(listItem: ListItemFields, ownerId: string, listId: string, ogName: string) {
+  verifyListOwner(ownerId, listId);
+  try{
+    await db.update(listItemTable).set(listItem as any).where(and(
+      eq(listItemTable.listId, listId),
+      eq(listItemTable.name, ogName)
+    ));
+  }
+  catch(e: any) {
+    console.error(e);
+    throw "Failed to update list item";
+  }
+  updateListTimestamp(ownerId, listId); 
+}
+
+export async function deleteListItem(ownerId: string, listId: string, itemName: string) {
+  verifyListOwner(ownerId, listId);
+  try {
+    await db.delete(listItemTable).where(and(
+      eq(listItemTable.name, itemName),
+      eq(listItemTable.listId, listId)
+    ));
+  }
+  catch(e: any) {
+    console.error(e);
+    throw "Failed to delete list item";
+  }
+  updateListTimestamp(ownerId, listId);
 }
 

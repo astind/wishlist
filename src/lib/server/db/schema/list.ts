@@ -1,17 +1,20 @@
 import {
 	boolean,
+	pgEnum,
 	pgTable,
 	primaryKey,
 	smallint,
 	text,
 	timestamp,
 	unique,
-    uuid
+  uuid
 } from 'drizzle-orm/pg-core';
 import { userTable } from './user';
 import { relations } from 'drizzle-orm';
 import { listItemTable } from './list-item';
 import { groupListsTable } from './group';
+
+export const listTypeEnum = pgEnum("list_type", ["wishlist", "checklist"])
 
 export const listTable = pgTable(
 	'list',
@@ -24,9 +27,10 @@ export const listTable = pgTable(
 		description: text('description'),
 		dateCreated: timestamp('date_created').defaultNow(),
 		lastUpdated: timestamp('last_updated'),
-		listPassword: text('list_password')
+		listPassword: text('list_password'),
+		listType: listTypeEnum("list_type").notNull().default("wishlist")
 	},
-	(t) => [unique('list_name').on(t.ownerId, t.name)]
+	(t) => [unique('unique_name').on(t.ownerId, t.name)]
 );
 
 export const listTableRelations = relations(listTable, ({ one, many }) => ({
