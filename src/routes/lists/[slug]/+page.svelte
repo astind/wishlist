@@ -130,7 +130,7 @@
 	</dialog>
 
 	<div class="flex flex-col items-center space-y-2">
-		<h1 class="text-2xl font-semibold">{data.list.name}</h1>
+		<h1 class="text-2xl mt-4 lg:mt-0 font-semibold">{data.list.name}</h1>
 		<p >{data.list.description}</p>
 	</div>
 	
