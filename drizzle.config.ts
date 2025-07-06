@@ -5,7 +5,7 @@ export default defineConfig({
 	schema: './src/lib/server/db/schema/*',
 
 	dbCredentials: {
-		url: process.env.DATABASE_URL
+		url: process.env.DATABASE_URL_ADMIN
 	},
 
 	verbose: true,

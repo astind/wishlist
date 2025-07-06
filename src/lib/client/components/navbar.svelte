@@ -17,7 +17,7 @@
     	document.querySelector('html')?.setAttribute('data-theme', 'coffee');
   	} else {
     	document.body.classList.remove('dark');
-    	document.querySelector('html')?.setAttribute('data-theme', 'silk');
+    	document.querySelector('html')?.setAttribute('data-theme', 'garden');
   	}		
 	}
 </script>

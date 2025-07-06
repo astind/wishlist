@@ -15,7 +15,7 @@
         All you need is a username and password.        
       </p>
     </div>
-    <div class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
+    <div class="card bg-base-100 border border-base-300 w-full max-w-sm shrink-0 shadow-2xl">
       <div class="card-body">
         <fieldset class="fieldset">
           <form action="?/login" method="post" use:enhance>
@@ -29,8 +29,8 @@
               </a>
             </div>
             <div class="flex mt-2 space-x-4">
-              <button class="btn btn-neutral">Login</button>
-              <button class="btn btn-neutral" formaction="?/register">Register</button>
+              <button class="btn btn-primary">Login</button>
+              <button class="btn btn-secondary" formaction="?/register">Register</button>
             </div> 
           </form>
         </fieldset>  

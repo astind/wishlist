@@ -93,7 +93,7 @@
 							</label>
 							<p class="label">Private lists cannot be found with a link.</p>
 							<div class="flex justify-end space-x-4">
-								<button type="submit" class="btn btn-accent">Save</button>
+								<button type="submit" class="btn btn-info">Save</button>
 							</div>
 						</fieldset>
 			 		</form>
@@ -148,7 +148,7 @@
 					};
 				}}
 			>
-				<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-md border p-4">
+				<fieldset class="fieldset bg-base-300 border-neutral rounded-box w-md border p-4">
 					<legend class="fieldset-legend">New List Item</legend>
 					<input type="hidden" name="listId" value={data.list.id}>
 					<label class="label" for="name">Name*</label>
@@ -179,7 +179,7 @@
 						Auto Delete Item if bought
 					</label>
 					<div class="flex justify-end space-x-4 mt-2">
-						<button class="btn btn-accent" type="submit">Save</button>
+						<button class="btn btn-info" type="submit">Save</button>
 						<button class="btn btn-error" type="button" onclick={cancelNewItem}>Cancel</button>
 					</div>
 					{#if form?.message}
@@ -232,7 +232,7 @@
             		Are you sure you want to delete this item?
             	</div>
             	<div class="ml-4">
-            		<button type="button" class="btn btn-accent" onclick={() => deleteIndex = -1}>Cancel</button>
+            		<button type="button" class="btn btn-info" onclick={() => deleteIndex = -1}>Cancel</button>
             		<button type="submit" class="btn btn-error">Delete</button>
             	</div>
             </form>
@@ -280,7 +280,7 @@
 									Auto Delete Item if bought
 								</label>
 								<div class="flex justify-end space-x-4 mt-2">
-									<button class="btn btn-accent" type="submit">Save</button>
+									<button class="btn btn-info" type="submit">Save</button>
 									<button class="btn btn-error" type="button" onclick={() => editIndex = -1}>Cancel</button>
 								</div>
 								{#if form?.message}

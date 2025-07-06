@@ -46,7 +46,7 @@
 					};
 				}}
 			>
-				<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+				<fieldset class="fieldset bg-base-300 border-neutral rounded-box w-xs border p-4">
 					<legend class="fieldset-legend">New List</legend>
 
 					<label class="label" for="name">Name*</label>
@@ -61,7 +61,7 @@
 						Private
 					</label>
 					<div class="flex justify-end space-x-4">
-						<button type="submit" class="btn btn-accent">Save</button>
+						<button type="submit" class="btn btn-info">Save</button>
 						<button type="button" class="btn btn-error" onclick={cancelNew}>Cancel</button>
 					</div>
 					{#if form?.message}
@@ -103,7 +103,7 @@
 								<input type="hidden" name="id" value={list.id} />
 								<div class="space-x-4">
 									<button type="submit" class="btn btn-error">Delete</button>
-									<button type="button" class="btn btn-accent" onclick={cancelDelete}>Cancel</button
+									<button type="button" class="btn btn-success" onclick={cancelDelete}>Cancel</button
 									>
 								</div>
 							</div>
