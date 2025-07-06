@@ -51,7 +51,7 @@ export async function updateList(listId: string, name: string, ownerId: string, 
       name: name, 
       description: description,
       private: isPrivate,
-      lastUpdated: new Date();
+      lastUpdated: new Date()
     }).where(
       and(
         eq(listTable.ownerId, ownerId),  

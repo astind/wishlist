@@ -4,6 +4,7 @@
 	import Dock from '$lib/client/components/dock.svelte';
 
 	let { children } = $props();
+
 </script>
 
 <div class="flex justify-center mt-8">
