@@ -52,188 +52,196 @@
 	}
 </script>
 
-<div>
 	
-	<div class="flex justify-between md:justify-end space-x-4">
-		<div class="space-x-4">
-			<button class="btn btn-square" type="button" aria-label="Settings" title="Settings" onclick={openSettings}>
+<div class="flex justify-between md:justify-end space-x-4">
+	<div class="space-x-4">
+		<button class="btn btn-square" type="button" aria-label="Settings" title="Settings" onclick={openSettings}>
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+				<path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
+				<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+			</svg>
+		</button>
+		{#if !data.list.private}
+  		<button class="btn btn-square" type="button" aria-label="Share" title="Share">
 				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  				<path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
-  				<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+					<path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
 				</svg>
 			</button>
-			{#if !data.list.private}
-    		<button class="btn btn-square" type="button" aria-label="Share" title="Share">
-					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  					<path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-					</svg>
-				</button>
-    	{/if}
-		</div>
-		
-		<button class="btn btn-primary" onclick={addNewItem}>Add Item</button>
-	</div>
-
-	<dialog id="list-settings-modal" class="modal">
-		<div class="modal-box">
-			<h3 class="text-lg font-bold">{data.list.name} Settings:</h3>
-			<input type="radio" name="list-settings" hidden id="list-settings-radio" checked>
-			<div class="collapse collapse-arrow bg-base-200 border-base-300 border mt-4">
-				<input type="radio" name="list-settings"/>
- 				<div class="collapse-title font-semibold">List Details</div>
-			 	<div class="collapse-content">
-			 		<form action="?/updateList" method="post" use:enhance>
-			 			<fieldset class="fieldset w-full px-4">
-  						<label class="label" for="name">Name:</label>
-  						<input type="text" id="name" class="input w-full" placeholder="Name" name="name" value={data.list.name} />
-
-  						<label class="label" for="description">Description</label>
-  						<input type="text" class="input w-full" id="description" name="description" value={data.list.description} placeholder="Description" />
-
-  						<label class="label mt-2">
-								<input type="checkbox" class="checkbox" name="private" checked={data.list.private} />
-								Private
-							</label>
-							<p class="label">Private lists cannot be found with a link.</p>
-							<div class="flex justify-end space-x-4">
-								<button type="submit" class="btn btn-info">Save</button>
-							</div>
-						</fieldset>
-			 		</form>
-  			</div>
-			</div>
-			<div class="collapse collapse-arrow bg-base-200 border-base-300 border mt-4">
-				<input type="radio" name="list-settings"/>
-				<div class="collapse-title font-semibold">List Groups</div>
-				<div class="collapse-content">
-					{#if data.list.groups.length}
-						
-					{:else}
-          	List has not been shared to any groups
-          {/if}
-				</div>
-			</div>
-
-			<div class="collapse collapse-arrow bg-base-200 border-base-300 border mt-4">
-				<input type="radio" name="list-settings"/>
-				<div class="collapse-title font-semibold">Shared Users:</div>
-				<div class="collapse-content">
-					{#if data.list.shared.length}
-						
-					{:else}
-          	List has not been shared with any users
-          {/if}
-				</div>
-			</div>
-			
-			<div class="modal-action">
-				<button class="btn" type="button" onclick={closeSettings}>Close</button>
-			</div>
-		</div>
-	</dialog>
-
-	<div class="flex flex-col items-center space-y-2">
-		<h1 class="text-2xl mt-4 lg:mt-0 font-semibold">{data.list.name}</h1>
-		<p >{data.list.description}</p>
+  	{/if}
 	</div>
 	
-	{#if addNew}
-		<div in:slide out:slide class="flex justify-center mt-4">
-			<form class="w-full"
-				action="?/newItem"
-				method="post"
-				use:enhance={() => {
-					return async ({ update, result }) => {
-						await update();
-						if (result.type === 'success') {
-							addNew = false;
-						}
-					};
-				}}
-			>
-				<fieldset class="flex flex-col mx-auto fieldset bg-base-200 border-base-300 rounded-box max-w-md border p-4">
-					<legend class="fieldset-legend">New List Item</legend>
-					<input type="hidden" name="listId" value={data.list.id}>
-					<label class="label" for="name">Name*</label>
-					<input
-						class="input w-full"
-						type="text"
-						id="name"
-						name="name"
-						placeholder="Name"
-						required
-					/>
+	<button class="btn btn-primary" onclick={addNewItem}>Add Item</button>
+</div>
+
+<dialog id="list-settings-modal" class="modal">
+	<div class="modal-box">
+		<h3 class="text-lg font-bold">{data.list.name} Settings:</h3>
+		<input type="radio" name="list-settings" hidden id="list-settings-radio" checked>
+		<div class="collapse collapse-arrow bg-base-200 border-base-300 border mt-4">
+			<input type="radio" name="list-settings"/>
+ 			<div class="collapse-title font-semibold">List Details</div>
+		 	<div class="collapse-content">
+		 		<form action="?/updateList" method="post" use:enhance>
+		 			<fieldset class="fieldset w-full px-4">
+						<label class="label" for="name">Name:</label>
+						<input type="text" id="name" class="input w-full" placeholder="Name" name="name" value={data.list.name} />
+
+						<label class="label" for="description">Description</label>
+						<input type="text" class="input w-full" id="description" name="description" value={data.list.description} placeholder="Description" />
+
+						<label class="label" for="list-type">List Type:</label>
+						<select name="listType" id="list-type" class="select" value={data.list?.listType}>
+							<option value="checklist">Checklist</option>
+							<option value="wishlist">Wishlist</option>
+						</select>
+
+						<label class="label mt-2">
+							<input type="checkbox" class="checkbox" name="private" checked={data.list.private} />
+							Private
+						</label>
+						<p class="label">Private lists cannot be found with a link.</p>
+						<div class="flex justify-end space-x-4">
+							<button type="submit" class="btn btn-info">Save</button>
+						</div>
+					</fieldset>
+		 		</form>
+			</div>
+		</div>
+		<div class="collapse collapse-arrow bg-base-200 border-base-300 border mt-4">
+			<input type="radio" name="list-settings"/>
+			<div class="collapse-title font-semibold">List Groups</div>
+			<div class="collapse-content">
+				{#if data.list.groups.length}
+					
+				{:else}
+        	List has not been shared to any groups
+        {/if}
+			</div>
+		</div>
+
+		<div class="collapse collapse-arrow bg-base-200 border-base-300 border mt-4">
+			<input type="radio" name="list-settings"/>
+			<div class="collapse-title font-semibold">Shared Users:</div>
+			<div class="collapse-content">
+				{#if data.list.shared.length}
+					
+				{:else}
+        	List has not been shared with any users
+        {/if}
+			</div>
+		</div>
+		
+		<div class="modal-action">
+			<button class="btn" type="button" onclick={closeSettings}>Close</button>
+		</div>
+	</div>
+</dialog>
+
+<div class="flex flex-col items-center space-y-2">
+	<h1 class="text-2xl mt-4 lg:mt-0 font-semibold">{data.list.name}</h1>
+	<p >{data.list.description}</p>
+</div>
+	
+{#if addNew}
+	<div in:slide out:slide class="flex justify-center mt-4">
+		<form class="w-full"
+			action="?/newItem"
+			method="post"
+			use:enhance={() => {
+				return async ({ update, result }) => {
+					await update();
+					if (result.type === 'success') {
+						addNew = false;
+					}
+				};
+			}}
+		>
+			<fieldset class="flex flex-col mx-auto fieldset bg-base-200 border-base-300 rounded-box max-w-md border p-4">
+				<legend class="fieldset-legend">New List Item</legend>
+				<input type="hidden" name="listId" value={data.list.id}>
+				<label class="label" for="name">Name*</label>
+				<input
+					class="input w-full"
+					type="text"
+					id="name"
+					name="name"
+					placeholder="Name"
+					required
+				/>
+				<label for="description" class="label">Description</label>
+				<textarea
+					class="textarea w-full"
+					placeholder="Description"
+					id="description"
+					name="description"
+				></textarea>
+				{#if data.list?.listType === 'wishlist'}
 					<label class="label" for="link">URL/Link</label>
 					<input class="input w-full" type="text" id="link" name="link" placeholder="Link" />
-					<label for="description" class="label">Description</label>
-					<textarea
-						class="textarea w-full"
-						placeholder="Description"
-						id="description"
-						name="description"
-					></textarea>
-					<label for="price" class="label">Price</label>
-					<div class="input w-full">
-						$
-						<input type="number" class="grow" placeholder="Price" name="price" step="0.01" />
-					</div>
-					<label class="label mt-2">
-						<input type="checkbox" class="checkbox" name="autoDelete" />
-						Auto Delete Item if bought
-					</label>
-					<div class="flex justify-end space-x-4 mt-2">
-						<button class="btn btn-info" type="submit">Save</button>
-						<button class="btn btn-error" type="button" onclick={cancelNewItem}>Cancel</button>
-					</div>
-					{#if form?.message}
-						<p class="mt-4 text-error">
-							{form.message}
-						</p>
-					{/if}
-				</fieldset>
-			</form>
-		</div>
-	{/if}
-
-	<div class="flex mt-4">
-		<h2 class="text-xl font-semibold">Items:</h2>
+				{/if}					
+				<label for="price" class="label">Price</label>
+				<div class="input w-full">
+					$
+					<input type="number" class="grow" placeholder="Price" name="price" step="0.01" />
+				</div>
+				<label class="label mt-2">
+					<input type="checkbox" class="checkbox" name="autoDelete" />
+					{data.list?.listType === 'wishlist' ? 'Auto-delete item if bought' : 'Auto-delete task when completed'}
+				</label>
+				<div class="flex justify-end space-x-4 mt-2">
+					<button class="btn btn-info" type="submit">Save</button>
+					<button class="btn btn-error" type="button" onclick={cancelNewItem}>Cancel</button>
+				</div>
+				{#if form?.message}
+					<p class="mt-4 text-error">
+						{form.message}
+					</p>
+				{/if}
+			</fieldset>
+		</form>
 	</div>
+{/if}
 
-	<ul class="bg-base-100 rounded-box shadow-md mt-4 p-5">
+<div class="flex mt-4">
+	<h2 class="text-xl font-semibold">Items:</h2>
+</div>
+	
+<div class="grow overflow-y-auto py-5">
+	<ul class="bg-base-100 rounded-box shadow-md p-5">
 		{#each data.list.items as item, index}
 			<li class="grid grid-cols-6 gap-y-2 gap-x-1 py-5 first:pt-0 last:pb-0 last:border-b-0 border-b border-base-200" in:fly={{ y: 20 }} out:slide>
-				{#if item.iconLink}
+				{#if item.iconLink || data.list?.listType === 'checklist'}
 					<div class="col-span-1">
-						<img src={item.iconLink} alt="list item" />
-					</div>
-					<div class="col-span-6 md:col-span-4">
-						{item.name}
-					</div>
-				{:else}
-					<div class="col-span-6 md:col-span-5">
-						<div class="flex justify-between text-xl">
-							<div class="font-semibold">
-								{item.name}
-							</div>
-							{#if item.price} 
-								<div class="text-xl md:hidden"> 
-									${item.price} 
-								</div> 
-							{/if}
-						</div>
-						{#if item.url}
-							<div class="text-sm truncate text-ellipsis mt-2">
-								<a rel="external" class="link" href={item.url} target="_blank">{item.url}</a>
-							</div>
-						{/if}
-												
-						{#if item.description}
-							<div class="mt-2">
-								{item.description}
-							</div>
-          	{/if}
+						{#if data.list?.listType === 'checklist'}
+							<input type="checkbox" class="checkbox checkbox-xl checkbox-success"/>
+						{:else}
+            	<img src={item.iconLink} alt="list item" />
+            {/if}
 					</div>
 				{/if}
+				<div class={(data.list?.listType === 'checklist' || item.iconLink) ? 'col-span-6 md:col-span-4' : 'col-span-6 md:col-span-5'}>
+					<div class="flex justify-between text-xl">
+						<div class="font-semibold">
+							{item.name}
+						</div>
+						{#if item.price} 
+							<div class="text-xl md:hidden"> 
+								${item.price} 
+							</div> 
+						{/if}
+					</div>
+					{#if data.list?.listType == 'wishlist' && item.url}
+						<div class="text-sm truncate text-ellipsis mt-2">
+							<a rel="external" class="link" href={item.url} target="_blank">{item.url}</a>
+						</div>
+					{/if}
+											
+					{#if item.description}
+						<div class="mt-2">
+							{item.description}
+						</div>
+          {/if}
+				</div>
 				<div class="col-span-6 md:col-span-1">
 					<div class="flex space-x-2 items-center justify-end">
 						<div class="hidden md:block text-xl">
@@ -274,7 +282,6 @@
 						</button>
 					</div>
         </div>
-        	
 				<div class="col-span-6">
 					{#if deleteIndex === index} 
 							<form class="mt-2 flex flex-col md:flex-row items-center" in:slide out:slide action="?/deleteItem" method="post" use:enhance={() => {
@@ -319,8 +326,6 @@
 										value={item.name}
 										required
 									/>
-									<label class="label" for="link">URL/Link</label>
-									<input class="input w-full" type="text" id="link" name="link" placeholder="Link" value={item.url} />
 									<label for="description" class="label">Description</label>
 									<textarea
 										class="textarea w-full"
@@ -329,6 +334,10 @@
 										name="description"
 										value={item.description}
 									></textarea>
+									{#if data.list?.listType === 'wishlist'}
+                  	<label class="label" for="link">URL/Link</label>
+										<input class="input w-full" type="text" id="link" name="link" placeholder="Link" value={item.url} />	
+                  {/if}
 									<label for="price" class="label">Price</label>
 									<div class="input w-full">
 										$
@@ -336,7 +345,7 @@
 									</div>
 									<label class="label mt-2">
 										<input type="checkbox" class="checkbox" name="autoDelete" checked={item.autoDelete}/>
-										Auto Delete Item if bought
+										{data.list?.listType === 'wishlist' ? 'Auto-delete item if bought' : 'Auto-delete task when completed'}									
 									</label>
 									<div class="flex justify-end space-x-4 mt-2">
 										<button class="btn btn-info" type="submit">Save</button>

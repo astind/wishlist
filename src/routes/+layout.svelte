@@ -11,7 +11,7 @@
 	<div class="flex flex-col w-full max-w-4xl">
 		<Navbar></Navbar>
 
-		<div class="bg-base-200 mt-8 min-h-dvh rounded-2xl p-4">
+		<div class="bg-base-200 mt-8 h-dvh rounded-2xl p-4 flex flex-col">
 			{@render children()}
 		</div>
 
