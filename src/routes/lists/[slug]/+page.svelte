@@ -311,7 +311,7 @@
 			<div class={(data.list?.listType === 'checklist' || item.iconLink) ? 'col-span-8 md:col-span-7' : 'col-span-10 md:col-span-8'}>
 				<div class="flex justify-between text-xl">
 					<div class="font-semibold">
-						{item.name} {item.done}
+						{item.name}
 					</div>
 					{#if item.price} 
 						<div class="text-xl md:hidden"> 
