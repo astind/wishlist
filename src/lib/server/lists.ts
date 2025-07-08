@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { listItemTable, listTable } from '$lib/server/db/schema';
+import { check } from 'drizzle-orm/mysql-core';
 
 export async function getLists(ownerId: string, limit?: number, orderByRecent: boolean = false) {
   let lists: any[] = [];
@@ -109,13 +110,10 @@ export type ListItemFields = {
   autoDelete: boolean;
 }
 
-async function updateListTimestamp(ownerId: string, listId: string) {
+async function updateListTimestamp(listId: string) {
   try {
     await db.update(listTable).set({lastUpdated: new Date()}).where(
-      and(
-        eq(listTable.id, listId),
-        eq(listTable.ownerId, ownerId)
-      )
+      eq(listTable.id, listId)
     )
   }
   catch(e: any) {
@@ -125,14 +123,11 @@ async function updateListTimestamp(ownerId: string, listId: string) {
 }
 
 async function verifyListOwner(ownerId: string, listId: string) {
-  console.log(ownerId);
-  console.log(listId);
   try {
     const list = await db.query.listTable.findFirst({
       columns: { ownerId: true, id: true},
       where: eq(listTable.id, listId)
     });
-    console.log(list);
     if (list?.ownerId !== ownerId) {
       throw "wrong owner"
     }
@@ -144,7 +139,6 @@ async function verifyListOwner(ownerId: string, listId: string) {
 }
 
 export async function newListItem(listItem: ListItemFields, ownerId: string, listId: string) {
-  
   try { 
     await verifyListOwner(ownerId, listId);
     const item = {...listItem, listId: listId}
@@ -154,7 +148,7 @@ export async function newListItem(listItem: ListItemFields, ownerId: string, lis
     console.error(e);
     throw "Failed to add item(s) to list";
   }
-  updateListTimestamp(ownerId, listId);
+  updateListTimestamp(listId);
   
 }
 
@@ -170,7 +164,7 @@ export async function editListItem(listItem: ListItemFields, ownerId: string, li
     console.error(e);
     throw "Failed to update list item";
   }
-  updateListTimestamp(ownerId, listId); 
+  updateListTimestamp(listId); 
 }
 
 export async function deleteListItem(ownerId: string, listId: string, itemName: string) {
@@ -185,25 +179,64 @@ export async function deleteListItem(ownerId: string, listId: string, itemName: 
     console.error(e);
     throw "Failed to delete list item";
   }
-  updateListTimestamp(ownerId, listId);
+  updateListTimestamp(listId);
 }
 
-export async function toggleDone(listId: string, itemName: string, by: string, done: boolean = true) {
+export async function toggleDone(listId: string, itemName: string, by: string) {
   try {
+    const item = await db.query.listItemTable.findFirst({
+      where: and(eq(listItemTable.name, itemName), eq(listItemTable.listId, listId)),
+      columns: {done: true}
+    });
+    if (!item) {
+      throw "Item not found";
+    }
+    let update: boolean = !item.done;
+    let date = null;
+    let byUser = null;
+    if (!item.done) {
+      date = new Date();
+      byUser = by;
+    }
     await db.update(listItemTable).set({
-      done: done,
-      doneBy: by,
-      dateDone: new Date()
+      done: update,
+      doneBy: byUser,
+      dateDone: date
     }).where(
       and(
         eq(listItemTable.name, itemName),
         eq(listItemTable.listId, listId)
       )
-    )
+    );
   }
   catch(e: any) {
     console.error(e);
     throw "Failed to mark as complete/bought"
   }
+}
+
+export async function deleteAllDone(listId: string, userId: string, checkShared: boolean = false) {
+  if (checkShared) {
+    // check if the list is shared
+  } else {
+    try {
+      await verifyListOwner(userId, listId);
+    }
+    catch(e: any) {
+      throw e;
+    }
+  }
+  try {
+    await db.delete(listItemTable).where(
+      and(
+        eq(listItemTable.listId, listId),
+        eq(listItemTable.done, true)
+      )
+    )
+  } catch (e: any) {
+    console.error(e);
+    throw "Failed to remove group";
+  }
+  updateListTimestamp(listId)
 }
 

@@ -1,20 +1,22 @@
 import { error, fail, redirect, type Actions, type RequestEvent } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { deleteListItem, editListItem, getList, newListItem, toggleDone } from '$lib/server/lists';
+import { deleteAllDone, deleteListItem, editListItem, getList, newListItem, toggleDone } from '$lib/server/lists';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!locals.user) {
 		return redirect(302, '/');
 	}
 	let listname = params.slug;
-	let list
 	try {
-		list = await getList(listname, locals.user.id);
+		const list = await getList(listname, locals.user.id);
+		if (!list) {
+			error(404, "List Not Found");
+		}
+		return { list };
 	}
 	catch (e: any) {
-		return error(404, {message: e});
+		error(404, e);
 	}
-	return { list: list };
 };
 
 function getFormData(form: FormData, key: string) {
@@ -88,8 +90,6 @@ async function deleteItem(event: RequestEvent) {
 
 async function markComplete(event: RequestEvent) {
 	const form = await event.request.formData();
-	console.log(form);
-	const done = form.get('complete') !== null && form.get('complete') === 'on';
 	const name = getFormData(form, "name");
 	const listId = getFormData(form, "listId");
 	if (!name || !listId) {
@@ -99,7 +99,7 @@ async function markComplete(event: RequestEvent) {
 		return fail(400, {message: "Missing user"});
 	}
 	try {
-		await toggleDone(listId as string, name as string, event.locals.user.id, done);
+		await toggleDone(listId as string, name as string, event.locals.user.id);
 	}
 	catch (e: any) {
 		return fail(500, {message: e});
@@ -110,7 +110,6 @@ async function newTask(event: RequestEvent) {
 	const form = await event.request.formData();
 	const name = getFormData(form, "name") as string;
 	const listId = getFormData(form, 'listId') as string;
-	console.log(form);
 	if (!name || !listId) {
 		return fail(400, {message: "Missing name or id"});
 	}
@@ -124,6 +123,21 @@ async function newTask(event: RequestEvent) {
 	}
 }
 
+async function deleteDone(event: RequestEvent) {
+	console.log('hello world');
+	const form = await event.request.formData();
+	const listId = getFormData(form, "listId") as string;
+	if (!listId || !event.locals.user) {
+		return fail(400, {message: "Missing required data"});
+	}
+	try {
+		await deleteAllDone(listId, event.locals.user.id);
+	}
+	catch(e: any) {
+		return fail(500, {message: e});
+	}
+}
+
 export const actions: Actions = {
 	newItem: updateItem,
 	deleteItem: deleteItem,
@@ -132,5 +146,6 @@ export const actions: Actions = {
 		return updateItem(event, false);
 	},
 	complete: markComplete,
-	newTask: newTask
+	newTask: newTask,
+	deleteDone: deleteDone
 };

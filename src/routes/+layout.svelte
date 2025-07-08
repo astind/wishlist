@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import Navbar from '$lib/client/components/navbar.svelte';
-	import Dock from '$lib/client/components/dock.svelte';
+	// import Dock from '$lib/client/components/dock.svelte';
 
 	let { children } = $props();
 
@@ -11,7 +11,7 @@
 	<div class="flex flex-col w-full max-w-4xl">
 		<Navbar></Navbar>
 
-		<div class="bg-base-200 mt-8 h-dvh rounded-2xl p-4 flex flex-col">
+		<div class="bg-base-200 mt-8 rounded-2xl p-4 flex flex-col min-h-svh">
 			{@render children()}
 		</div>
 
