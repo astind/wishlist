@@ -8,6 +8,7 @@
 	let editIndex: number = $state(-1);
 	let deleteIndex: number = $state(-1);
 	let checkedItems: string[] = $state([]);
+	let taskInput: HTMLElement;
 
 	function addNewItem() {
 		addNew = true;
@@ -52,18 +53,13 @@
 		}
 	}
 
-	function checkboxChange(event: any, name: string) {
-		const checked = event.target.checked;
-		if (checked) {
-			checkedItems.push(name);	
-		} else {
-			const index = checkedItems.indexOf(name);
-			if (index !== -1) {
-				checkedItems.splice(index, 1);	
-			}
+	function onCheck(name: string) {
+		const form: HTMLFormElement = document.getElementById(name + "-checkbox") as HTMLFormElement;
+		if (form) {
+			form.requestSubmit();
 		}
-		
 	}
+	
 </script>
 
 	
@@ -84,7 +80,11 @@
   	{/if}
 	</div>
 	
-	<button class="btn btn-primary" onclick={addNewItem}>Add Item</button>
+	<button class="btn btn-square" onclick={addNewItem} aria-label="Add Item" title="Add Item">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  		<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+		</svg>
+	</button>
 </div>
 
 <dialog id="list-settings-modal" class="modal">
@@ -158,61 +158,97 @@
 	
 {#if addNew}
 	<div in:slide out:slide class="flex justify-center mt-4">
-		<form class="w-full"
-			action="?/newItem"
-			method="post"
-			use:enhance={() => {
-				return async ({ update, result }) => {
-					await update();
-					if (result.type === 'success') {
-						addNew = false;
+		{#if data.list?.listType === "checklist"}
+			<form class="w-full"
+				action="?/newTask"
+				method="post"
+				use:enhance={() => {
+					return async ({update}) => {
+						await update();
+						taskInput.focus();
 					}
-				};
-			}}
-		>
-			<fieldset class="flex flex-col mx-auto fieldset bg-base-200 border-base-300 rounded-box max-w-md border p-4">
-				<legend class="fieldset-legend">New List Item</legend>
-				<input type="hidden" name="listId" value={data.list.id}>
-				<label class="label" for="name">Name*</label>
-				<input
-					class="input w-full"
-					type="text"
-					id="name"
-					name="name"
-					placeholder="Name"
-					required
-				/>
-				<label for="description" class="label">Description</label>
-				<textarea
-					class="textarea w-full"
-					placeholder="Description"
-					id="description"
-					name="description"
-				></textarea>
-				{#if data.list?.listType === 'wishlist'}
-					<label class="label" for="link">URL/Link</label>
-					<input class="input w-full" type="text" id="link" name="link" placeholder="Link" />
-				{/if}					
-				<label for="price" class="label">Price</label>
-				<div class="input w-full">
-					$
-					<input type="number" class="grow" placeholder="Price" name="price" step="0.01" />
-				</div>
-				<label class="label mt-2">
-					<input type="checkbox" class="checkbox" name="autoDelete" />
-					{data.list?.listType === 'wishlist' ? 'Auto-delete item if bought' : 'Auto-delete task when completed'}
-				</label>
-				<div class="flex justify-end space-x-4 mt-2">
-					<button class="btn btn-info" type="submit">Save</button>
-					<button class="btn btn-error" type="button" onclick={cancelNewItem}>Cancel</button>
-				</div>
-				{#if form?.message}
-					<p class="mt-4 text-error">
-						{form.message}
-					</p>
-				{/if}
-			</fieldset>
-		</form>
+				}}>
+				<fieldset class="flex flex-col mx-auto fieldset bg-base-200 border-base-300 rounded-box max-w-md border p-4">
+					<legend class="fieldset-legend">New Task</legend>
+					<input type="hidden" name="listId" value={data.list.id}>
+					<label class="label" for="name">Name*</label>
+					<input
+						class="input w-full"
+						type="text"
+						id="name"
+						name="name"
+						placeholder="Name"
+						bind:this={taskInput}
+						required
+					/>
+					<div class="flex justify-end mt-2">
+						<button class="btn btn-error" type="button" onclick={cancelNewItem}>Cancel</button>
+					</div>
+					{#if form?.message}
+						<p class="mt-4 text-error">
+							{form.message}
+						</p>
+					{/if}
+				</fieldset>
+			</form>
+    	
+    {:else}
+			<form class="w-full"
+				action="?/newItem"
+				method="post"
+				use:enhance={() => {
+					return async ({ update, result }) => {
+						await update();
+						if (result.type === 'success') {
+							addNew = false;
+						}
+					};
+				}}
+			>
+				<fieldset class="flex flex-col mx-auto fieldset bg-base-200 border-base-300 rounded-box max-w-md border p-4">
+					<legend class="fieldset-legend">New List Item</legend>
+					<input type="hidden" name="listId" value={data.list.id}>
+					<label class="label" for="name">Name*</label>
+					<input
+						class="input w-full"
+						type="text"
+						id="name"
+						name="name"
+						placeholder="Name"
+						required
+					/>
+					<label for="description" class="label">Description</label>
+					<textarea
+						class="textarea w-full"
+						placeholder="Description"
+						id="description"
+						name="description"
+					></textarea>
+					{#if data.list?.listType === 'wishlist'}
+						<label class="label" for="link">URL/Link</label>
+						<input class="input w-full" type="text" id="link" name="link" placeholder="Link" />
+					{/if}					
+					<label for="price" class="label">Price</label>
+					<div class="input w-full">
+						$
+						<input type="number" class="grow" placeholder="Price" name="price" step="0.01" />
+					</div>
+					<label class="label mt-2">
+						<input type="checkbox" class="checkbox" name="autoDelete" />
+						{data.list?.listType === 'wishlist' ? 'Auto-delete item if bought' : 'Auto-delete task when completed'}
+					</label>
+					<div class="flex justify-end space-x-4 mt-2">
+						<button class="btn btn-info" type="submit">Save</button>
+						<button class="btn btn-error" type="button" onclick={cancelNewItem}>Cancel</button>
+					</div>
+					{#if form?.message}
+						<p class="mt-4 text-error">
+							{form.message}
+						</p>
+					{/if}
+				</fieldset>
+			</form>
+		{/if}
 	</div>
 {/if}
 
@@ -234,8 +270,10 @@
 				{#if item.iconLink || data.list?.listType === 'checklist'}
 					<div class="col-span-2 md:col-span-1 flex items-center">
 						{#if data.list?.listType === 'checklist'}
-							<form action="?/complete" method="POST">
-								<input type="checkbox" class="checkbox checkbox-xl checkbox-success" checked={item.bought} value={item.name} />							
+							<form action="?/complete" method="POST" id={item.name + '-checkbox'} use:enhance>
+								<input type="hidden" name="listId" value={data.list.id}>
+								<input type="hidden" name="name" value={item.name}>
+								<input type="checkbox" class="checkbox checkbox-xl checkbox-success" name="complete" checked={item.done} onchange={() => onCheck(item.name)}/>							
 							</form>
 						{:else}
             	<img src={item.iconLink} alt="list item" />

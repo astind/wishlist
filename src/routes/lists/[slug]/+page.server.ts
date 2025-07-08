@@ -1,9 +1,6 @@
 import { error, fail, redirect, type Actions, type RequestEvent } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
-import { and, eq } from 'drizzle-orm';
-import { listItemTable, listTable } from '$lib/server/db/schema';
-import { getList } from '$lib/server/lists';
+import { deleteListItem, editListItem, getList, newListItem, toggleDone } from '$lib/server/lists';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!locals.user) {
@@ -29,49 +26,46 @@ function getFormData(form: FormData, key: string) {
 
 async function updateItem(event: RequestEvent, newItem: boolean = true) {
 	const form = await event.request.formData();
-	const name = getFormData(form, 'name');
+	const name = getFormData(form, 'name') as string;
 	if (!name) {
 		return fail(400, { message: 'Name field is required' });
 	}
-	const url = getFormData(form, 'link');
-	const price = getFormData(form, 'price');
-	const description = getFormData(form, 'description');
+	const url = getFormData(form, 'link') as string | null;
+	const price = getFormData(form, 'price') as string | null;
+	const description = getFormData(form, 'description') as string | null;
 	const autoDelete = form.get('autoDelete') !== null && form.get('autoDelete') === 'on';
-	const listId = getFormData(form, 'listId');
+	const listId = getFormData(form, 'listId') as string;
 	if (!listId) {
 		return fail(400, { message: 'List Id is missing' });
 	}
-	const ogName = getFormData(form, 'ogName');
+	if (!event.locals.user) {
+		return fail(400, {message: "missing user"});
+	}
+	const ogName = getFormData(form, 'ogName') as string;
+	if (!newItem && !ogName) {
+		return fail(400, {message: "Missing original name value"});
+	}
 	try {
 		if (newItem) {
-			await db.insert(listItemTable).values({
+			await newListItem({
 				name: name,
-				description: description,
-				url: url,
-				price: price,
-				listId: listId,
+				description: description || undefined,
+				url: url || undefined,
+				price: price || undefined,
 				autoDelete: autoDelete
-			});	
+				 
+			}, event.locals.user.id, listId)	
 		} else {
-			await db.update(listItemTable).set({
+			await editListItem({
 				name: name,
-				description: description,
-				url: url,
-				price: price,
+				description: description || undefined,
+				url: url || undefined,
+				price: price || undefined,
 				autoDelete: autoDelete
-			}).where(
-				and(
-					eq(listItemTable.name, ogName), 
-					eq(listItemTable.listId, listId)
-				)
-			)
+			}, event.locals.user.id, listId, ogName) 
 		}
 	} catch (e: any) {
-		let message = 'Failed to create new list item';
-		if (e.message) {
-			message = e.message;
-		}
-		return fail(500, { message: message });
+		return fail(500, { message: e });
 	}
 }
 
@@ -80,21 +74,53 @@ async function deleteItem(event: RequestEvent) {
 	const name = getFormData(form, 'name');
 	const listId = getFormData(form, 'listId');
 	if (!name || !listId) {
-		fail(400, {message: "Missing name and list ID"});
+		return fail(400, {message: "Missing name or list ID"});
+	}
+	if (!event.locals.user) {
+		return fail(400, {message: ""})
 	}
 	try {
-		await db.delete(listItemTable).where(
-			and(
-				eq(listItemTable.name, name),
-				eq(listItemTable.listId, listId)
-			)
-		);
+		await deleteListItem(event.locals.user.id, listId as string, name as string);
+	} catch (e: any) {		
+		return fail(500, {message: e});
+	}
+}
+
+async function markComplete(event: RequestEvent) {
+	const form = await event.request.formData();
+	console.log(form);
+	const done = form.get('complete') !== null && form.get('complete') === 'on';
+	const name = getFormData(form, "name");
+	const listId = getFormData(form, "listId");
+	if (!name || !listId) {
+		return fail(400, {message: "Missing item name"})
+	}
+	if (!event.locals.user) {
+		return fail(400, {message: "Missing user"});
+	}
+	try {
+		await toggleDone(listId as string, name as string, event.locals.user.id, done);
+	}
+	catch (e: any) {
+		return fail(500, {message: e});
+	}
+}
+
+async function newTask(event: RequestEvent) {
+	const form = await event.request.formData();
+	const name = getFormData(form, "name") as string;
+	const listId = getFormData(form, 'listId') as string;
+	console.log(form);
+	if (!name || !listId) {
+		return fail(400, {message: "Missing name or id"});
+	}
+	if (!event.locals.user) {
+		return fail(400, {message: "Missing user"});
+	}
+	try {
+		await newListItem({name: name, autoDelete: false}, event.locals.user.id, listId);
 	} catch (e: any) {
-		let message = "Failed to delete list item";
-		if (e.message) {
-			message = e.message;
-		}
-		return fail(500, {message: message});
+		return fail(500, {message: e});
 	}
 }
 
@@ -104,5 +130,7 @@ export const actions: Actions = {
 	updateList: async (event) => {},
 	editItem: async (event) => {
 		return updateItem(event, false);
-	}
+	},
+	complete: markComplete,
+	newTask: newTask
 };

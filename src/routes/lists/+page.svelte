@@ -57,7 +57,7 @@
 					</textarea>
 
 					<label for="list-type" class="label">List Type</label>
-					<select name="listType" id="list-type" class="select">
+					<select name="listType" id="list-type" class="select" required>
 						<option disabled selected>Select a list type</option>
 						<option value="wishlist">Wishlist</option>
 						<option value="checklist">Checklist</option>

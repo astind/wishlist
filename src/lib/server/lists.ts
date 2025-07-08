@@ -86,7 +86,9 @@ export async function getList(listName: string, ownerId: string) {
     const list = await db.query.listTable.findFirst({
       where: and(eq(listTable.name, listName), eq(listTable.ownerId, ownerId)),
       with: {
-        items: true,
+        items: {
+          orderBy: [desc(listItemTable.dateAdded)]
+        },
         shared: true,
         groups: true
       }
@@ -109,7 +111,7 @@ export type ListItemFields = {
 
 async function updateListTimestamp(ownerId: string, listId: string) {
   try {
-    db.update(listTable).set({lastUpdated: new Date()}).where(
+    await db.update(listTable).set({lastUpdated: new Date()}).where(
       and(
         eq(listTable.id, listId),
         eq(listTable.ownerId, ownerId)
@@ -123,12 +125,15 @@ async function updateListTimestamp(ownerId: string, listId: string) {
 }
 
 async function verifyListOwner(ownerId: string, listId: string) {
+  console.log(ownerId);
+  console.log(listId);
   try {
     const list = await db.query.listTable.findFirst({
       columns: { ownerId: true, id: true},
       where: eq(listTable.id, listId)
     });
-    if (list?.id !== ownerId) {
+    console.log(list);
+    if (list?.ownerId !== ownerId) {
       throw "wrong owner"
     }
   }
@@ -138,10 +143,12 @@ async function verifyListOwner(ownerId: string, listId: string) {
   }
 }
 
-export async function newListItem(listItems: ListItemFields[], ownerId: string, listId: string) {
-  verifyListOwner(ownerId, listId);
+export async function newListItem(listItem: ListItemFields, ownerId: string, listId: string) {
+  
   try { 
-    await db.insert(listItemTable).values(listItems as any);
+    await verifyListOwner(ownerId, listId);
+    const item = {...listItem, listId: listId}
+    await db.insert(listItemTable).values(item as any);
   }
   catch(e: any) {
     console.error(e);
@@ -152,8 +159,8 @@ export async function newListItem(listItems: ListItemFields[], ownerId: string, 
 }
 
 export async function editListItem(listItem: ListItemFields, ownerId: string, listId: string, ogName: string) {
-  verifyListOwner(ownerId, listId);
   try{
+    await verifyListOwner(ownerId, listId);    
     await db.update(listItemTable).set(listItem as any).where(and(
       eq(listItemTable.listId, listId),
       eq(listItemTable.name, ogName)
@@ -167,8 +174,8 @@ export async function editListItem(listItem: ListItemFields, ownerId: string, li
 }
 
 export async function deleteListItem(ownerId: string, listId: string, itemName: string) {
-  verifyListOwner(ownerId, listId);
   try {
+    await verifyListOwner(ownerId, listId);
     await db.delete(listItemTable).where(and(
       eq(listItemTable.name, itemName),
       eq(listItemTable.listId, listId)
@@ -179,5 +186,24 @@ export async function deleteListItem(ownerId: string, listId: string, itemName: 
     throw "Failed to delete list item";
   }
   updateListTimestamp(ownerId, listId);
+}
+
+export async function toggleDone(listId: string, itemName: string, by: string, done: boolean = true) {
+  try {
+    await db.update(listItemTable).set({
+      done: done,
+      doneBy: by,
+      dateDone: new Date()
+    }).where(
+      and(
+        eq(listItemTable.name, itemName),
+        eq(listItemTable.listId, listId)
+      )
+    )
+  }
+  catch(e: any) {
+    console.error(e);
+    throw "Failed to mark as complete/bought"
+  }
 }
 
