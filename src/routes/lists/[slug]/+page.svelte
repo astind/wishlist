@@ -181,6 +181,7 @@
 						bind:this={taskInput}
 						required
 					/>
+					<p>Enter to submit</p>
 					<div class="flex justify-end mt-2">
 						<button class="btn btn-error" type="button" onclick={cancelNewItem}>Cancel</button>
 					</div>
