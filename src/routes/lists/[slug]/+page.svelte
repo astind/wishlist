@@ -4,9 +4,10 @@
 
 	let { data, form } = $props();
 
-	let addNew = $state(false);
-	let editIndex = $state(-1);
-	let deleteIndex = $state(-1);
+	let addNew: boolean = $state(false);
+	let editIndex: number = $state(-1);
+	let deleteIndex: number = $state(-1);
+	let checkedItems: string[] = $state([]);
 
 	function addNewItem() {
 		addNew = true;
@@ -49,6 +50,19 @@
 		if (radio) {
 			radio.checked = true;
 		}
+	}
+
+	function checkboxChange(event: any, name: string) {
+		const checked = event.target.checked;
+		if (checked) {
+			checkedItems.push(name);	
+		} else {
+			const index = checkedItems.indexOf(name);
+			if (index !== -1) {
+				checkedItems.splice(index, 1);	
+			}
+		}
+		
 	}
 </script>
 
@@ -202,24 +216,33 @@
 	</div>
 {/if}
 
-<div class="flex mt-4">
+<div class="flex mt-4 justify-between items-center min-h-10">
 	<h2 class="text-xl font-semibold">Items:</h2>
+	{#if data.list?.listType === "checklist" && checkedItems.length > 0}
+  	<button class="btn btn-square" type="button" aria-label="Delete all checked items">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  			<path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+			</svg>
+  	</button>
+  {/if}
 </div>
 	
-<div class="grow overflow-y-auto py-5">
+<div class="grow overflow-y-auto py-5 overscroll-contain">
 	<ul class="bg-base-100 rounded-box shadow-md p-5">
 		{#each data.list.items as item, index}
-			<li class="grid grid-cols-6 gap-y-2 gap-x-1 py-5 first:pt-0 last:pb-0 last:border-b-0 border-b border-base-200" in:fly={{ y: 20 }} out:slide>
+			<li class="grid grid-cols-10 gap-y-2 gap-x-1 py-5 first:pt-0 last:pb-0 last:border-b-0 border-b border-base-200" in:fly={{ y: 20 }} out:slide>
 				{#if item.iconLink || data.list?.listType === 'checklist'}
-					<div class="col-span-1">
+					<div class="col-span-2 md:col-span-1 flex items-center">
 						{#if data.list?.listType === 'checklist'}
-							<input type="checkbox" class="checkbox checkbox-xl checkbox-success"/>
+							<form action="?/complete" method="POST">
+								<input type="checkbox" class="checkbox checkbox-xl checkbox-success" checked={item.bought} value={item.name} />							
+							</form>
 						{:else}
             	<img src={item.iconLink} alt="list item" />
             {/if}
 					</div>
 				{/if}
-				<div class={(data.list?.listType === 'checklist' || item.iconLink) ? 'col-span-6 md:col-span-4' : 'col-span-6 md:col-span-5'}>
+				<div class={(data.list?.listType === 'checklist' || item.iconLink) ? 'col-span-8 md:col-span-7' : 'col-span-10 md:col-span-8'}>
 					<div class="flex justify-between text-xl">
 						<div class="font-semibold">
 							{item.name}
@@ -242,7 +265,7 @@
 						</div>
           {/if}
 				</div>
-				<div class="col-span-6 md:col-span-1">
+				<div class="col-span-10 md:col-span-2">
 					<div class="flex space-x-2 items-center justify-end">
 						<div class="hidden md:block text-xl">
 							${item.price}
@@ -282,7 +305,7 @@
 						</button>
 					</div>
         </div>
-				<div class="col-span-6">
+				<div class="col-span-10">
 					{#if deleteIndex === index} 
 							<form class="mt-2 flex flex-col md:flex-row items-center" in:slide out:slide action="?/deleteItem" method="post" use:enhance={() => {
             		return async ({update, result}) => {

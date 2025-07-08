@@ -53,8 +53,15 @@
 					<input type="text" class="input" placeholder="Name" name="name" id="name" required />
 
 					<label class="label" for="description">Description</label>
-					<textarea class="textarea" placeholder="Description" id="description" name="description"
-					></textarea>
+					<textarea class="textarea" placeholder="Description" id="description" name="description">
+					</textarea>
+
+					<label for="list-type" class="label">List Type</label>
+					<select name="listType" id="list-type" class="select">
+						<option disabled selected>Select a list type</option>
+						<option value="wishlist">Wishlist</option>
+						<option value="checklist">Checklist</option>
+					</select>
 
 					<label class="label mt-2">
 						<input type="checkbox" class="checkbox" name="private" />

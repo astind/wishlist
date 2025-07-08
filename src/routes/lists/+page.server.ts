@@ -26,11 +26,17 @@ export const actions: Actions = {
 		const description = form.get('description') as string | null;
 		const checkPrivate = form.get('private');
 		const isPrivate = checkPrivate !== null && checkPrivate === 'on';
+		const listType = form.get('listType');
+		if (listType) {
+			if (listType !== "wishlist" && listType !== "checklist") {
+				return fail(404, {message: "Invalid list type"});
+			}
+		}
 		if (!event.locals.user) {
 			return fail(404, {message: "Missing User"});
 		}
 		try {
-			newList(name as string, event.locals.user.id, description || undefined, isPrivate);
+			newList(name as string, event.locals.user.id, description || undefined, isPrivate, listType || undefined as any);
 		} catch (e: any) {
 			return fail(500, { message: e });
 		}

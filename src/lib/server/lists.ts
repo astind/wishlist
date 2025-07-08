@@ -2,7 +2,6 @@ import { db } from '$lib/server/db';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { listItemTable, listTable } from '$lib/server/db/schema';
 
-
 export async function getLists(ownerId: string, limit?: number, orderByRecent: boolean = false) {
   let lists: any[] = [];
 	try {
@@ -31,12 +30,13 @@ export async function getLists(ownerId: string, limit?: number, orderByRecent: b
 	return lists;
 }
 
-export async function newList(name: string, ownerId: string, description?: string, isPrivate: boolean = false) {
+export async function newList(name: string, ownerId: string, description?: string, isPrivate: boolean = false, listType: "wishlist" | "checklist" = "wishlist") {
   try {
     await db.insert(listTable).values({
       name: name,
       ownerId: ownerId,
       description: description,
+      listType: listType,
       private: isPrivate
     });
   } catch(e: any) {
@@ -45,13 +45,15 @@ export async function newList(name: string, ownerId: string, description?: strin
   }
 }
 
-export async function updateList(listId: string, name: string, ownerId: string, description?: string, isPrivate: boolean = false) {
+export async function updateList(listId: string, name: string, ownerId: string, description?: string, isPrivate: boolean = false, listType: "wishlist" | "checklist" = "wishlist", listPassword?: string) {
   try {
     await db.update(listTable).set({
       name: name, 
       description: description,
       private: isPrivate,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
+      listType: listType,
+      listPassword: listPassword
     }).where(
       and(
         eq(listTable.ownerId, ownerId),  
