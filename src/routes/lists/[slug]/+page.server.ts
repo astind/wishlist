@@ -58,13 +58,17 @@ async function updateItem(event: RequestEvent, newItem: boolean = true) {
 				 
 			}, event.locals.user.id, listId)	
 		} else {
-			await editListItem({
+			const itemId = getFormData(form, 'itemId') as string;
+			if (!itemId) {
+				return fail(400, {message: "Missing item ID"});
+			}
+			await editListItem(+itemId, {
 				name: name,
 				description: description || undefined,
 				url: url || undefined,
 				price: price || undefined,
 				autoDelete: autoDelete
-			}, event.locals.user.id, listId, ogName) 
+			}, event.locals.user.id, listId); 
 		}
 	} catch (e: any) {
 		return fail(500, { message: e });
@@ -73,16 +77,16 @@ async function updateItem(event: RequestEvent, newItem: boolean = true) {
 
 async function deleteItem(event: RequestEvent) {
 	const form = await event.request.formData();
-	const name = getFormData(form, 'name');
-	const listId = getFormData(form, 'listId');
-	if (!name || !listId) {
-		return fail(400, {message: "Missing name or list ID"});
+	const itemId = getFormData(form, 'itemId') as string;
+	const listId = getFormData(form, "listId") as string;
+	if (!itemId || !listId) {
+		return fail(400, {message: "Missing item IDs"});
 	}
 	if (!event.locals.user) {
-		return fail(400, {message: ""})
+		return fail(400, {message: "Missing User"})
 	}
 	try {
-		await deleteListItem(event.locals.user.id, listId as string, name as string);
+		await deleteListItem(+itemId, event.locals.user.id, listId);
 	} catch (e: any) {		
 		return fail(500, {message: e});
 	}
@@ -90,16 +94,15 @@ async function deleteItem(event: RequestEvent) {
 
 async function markComplete(event: RequestEvent) {
 	const form = await event.request.formData();
-	const name = getFormData(form, "name");
-	const listId = getFormData(form, "listId");
-	if (!name || !listId) {
-		return fail(400, {message: "Missing item name"})
+	const itemId = getFormData(form, "itemId") as string;
+	if (!itemId) {
+		return fail(400, {message: "Missing item ID"})
 	}
 	if (!event.locals.user) {
 		return fail(400, {message: "Missing user"});
 	}
 	try {
-		await toggleDone(listId as string, name as string, event.locals.user.id);
+		await toggleDone(+itemId, event.locals.user.id);
 	}
 	catch (e: any) {
 		return fail(500, {message: e});
@@ -124,7 +127,6 @@ async function newTask(event: RequestEvent) {
 }
 
 async function deleteDone(event: RequestEvent) {
-	console.log('hello world');
 	const form = await event.request.formData();
 	const listId = getFormData(form, "listId") as string;
 	if (!listId || !event.locals.user) {

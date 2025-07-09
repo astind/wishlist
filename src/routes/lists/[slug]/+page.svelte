@@ -8,7 +8,7 @@
 	let addNew: boolean = $state(false);
 	let editIndex: number = $state(-1);
 	let deleteIndex: number = $state(-1);
-	let checkedItems: string[] = $state([]);
+	let checkedItems: number[] = $state([]);
 	let taskInput: HTMLElement;
 	let settingsModal: any;
 	let settingsRadio: HTMLInputElement;
@@ -17,7 +17,7 @@
 		for(let i = 0; i < data.list.items.length; i++) {
 			const item = data.list.items[i];
 			if (item.done) {
-				checkedItems.push(item.name);
+				checkedItems.push(item.id);
 			}
 		}
 	});
@@ -56,17 +56,17 @@
 		settingsRadio.checked = true;
 	}
 
-	function addToCheckedList(name: string, checked: boolean) {
+	function addToCheckedList(id: number, checked: boolean) {
 		if (checked) {
-			checkedItems.push(name)
+			checkedItems.push(id)
 		} else {
-			const index = checkedItems.indexOf(name);
+			const index = checkedItems.findIndex((v) => v === id);
 			checkedItems.splice(index, 1);
 		}
 	}
 
-	function onCheck(name: string) {
-		const form: HTMLFormElement = document.getElementById(name + "-checkbox") as HTMLFormElement;
+	function onCheck(id: number) {
+		const form: HTMLFormElement = document.getElementById(id + "-checkbox") as HTMLFormElement;
 		if (form) {
 			form.requestSubmit();
 		}
@@ -294,13 +294,12 @@
 			{#if item.iconLink || data.list?.listType === 'checklist'}
 				<div class="col-span-2 md:col-span-1 flex items-center">
 					{#if data.list?.listType === 'checklist'}
-						<form action="?/complete" method="POST" id={item.name + '-checkbox'} use:enhance>
-							<input type="hidden" name="listId" value={data.list.id}>
-							<input type="hidden" name="name" value={item.name}>
+						<form action="?/complete" method="POST" id={item.id + '-checkbox'} use:enhance>
+							<input type="hidden" name="itemId" value={item.id}>
 							<input type="checkbox" class="checkbox checkbox-xl checkbox-success" checked={item.done} onclick={(event) => {
 								event.preventDefault();
-								addToCheckedList(item.name, !item.done);
-								onCheck(item.name)
+								addToCheckedList(item.id, !item.done);
+								onCheck(item.id)
 							}}/>
 						</form>
 					{:else}
@@ -308,16 +307,11 @@
           {/if}
 				</div>
 			{/if}
-			<div class={(data.list?.listType === 'checklist' || item.iconLink) ? 'col-span-8 md:col-span-7' : 'col-span-10 md:col-span-8'}>
+			<div class={(data.list?.listType === 'checklist' || item.iconLink) ? 'col-span-6 md:col-span-7 flex flex-col justify-center' : 'col-span-8 flex flex-col justify-center'}>
 				<div class="flex justify-between text-xl">
 					<div class="font-semibold">
 						{item.name}
 					</div>
-					{#if item.price} 
-						<div class="text-xl md:hidden"> 
-							${item.price} 
-						</div> 
-					{/if}
 				</div>
 				{#if data.list?.listType == 'wishlist' && item.url}
 					<div class="text-sm truncate text-ellipsis mt-1">
@@ -331,12 +325,13 @@
 					</div>
         {/if}
 			</div>
-			<div class="col-span-10 md:col-span-2">
-				<div class="flex space-x-2 items-center justify-end">
-					<div class="hidden md:block text-xl">
-						${item.price}
-					</div>
-					
+			<div class={[true && 'col-span-2 flex justify-end', data.list?.listType === 'checklist' && 'items-center md:items-start', data.list?.listType === 'wishlist' && 'items-start']}>
+				<div class="flex md:space-x-2 items-center justify-end">
+					{#if item.price}
+						<div class="text-xl mr-1">
+							${item.price}
+						</div>
+					{/if}
         	<button aria-label="Edit Item" onclick={() => openEditItem(index)} class="btn btn-square btn-ghost">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -353,7 +348,7 @@
 							/>
 						</svg>
 					</button>
-					<button aria-label="Delete Item" onclick={() => openDeleteItem(index)} class="btn btn-square btn-ghost">
+					<button aria-label="Delete Item" onclick={() => openDeleteItem(index)} class="hidden md:flex btn btn-square btn-ghost">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
@@ -382,7 +377,7 @@
           		}
           	}}>
           		<div>
-          			<input type="hidden" name="name" value={item.name}/>
+          			<input type="hidden" name="itemId" value={item.id}/>
           			<input type="hidden" name="listId" value={data.list.id}/>	
           			Are you sure you want to delete this item?
           		</div>
@@ -393,6 +388,24 @@
           	</form>
         	{/if}
         	{#if editIndex === index}
+        		<div class="md:hidden flex justify-end mt-2">
+        			<button type="button" class="btn btn-square btn-ghost" aria-label="Delete item" onclick={() => openDeleteItem(index)}>
+        				<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									class="size-6"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+									/>
+								</svg>
+        			</button>
+        		</div>
         		<form action="?/editItem" method="post" in:slide out:slide use:enhance={() => {
         			return async ({result, update}) => {
         				if (result.type === 'success') {
@@ -404,7 +417,7 @@
         			<fieldset class="flex flex-col mx-auto fieldset bg-base-200 border-base-300 rounded-box max-w-md border p-4">
 								<legend class="fieldset-legend">Edit Item</legend>
 								<input type="hidden" name="listId" value={data.list.id}/>
-								<input type="hidden" name="ogName" value={item.name}/>
+								<input type="hidden" name="itemId" value={item.id}/>
 								<label class="label" for="name">Name*</label>
 								<input
 									class="input w-full"

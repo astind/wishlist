@@ -138,9 +138,13 @@ async function verifyListOwner(ownerId: string, listId: string) {
   }
 }
 
-export async function newListItem(listItem: ListItemFields, ownerId: string, listId: string) {
+export async function newListItem(listItem: ListItemFields, userId: string, listId: string, owner: boolean = true) {
   try { 
-    await verifyListOwner(ownerId, listId);
+    if (owner) {
+      await verifyListOwner(userId, listId);
+    } else {
+      // check for shared list
+    }
     const item = {...listItem, listId: listId}
     await db.insert(listItemTable).values(item as any);
   }
@@ -149,16 +153,14 @@ export async function newListItem(listItem: ListItemFields, ownerId: string, lis
     throw "Failed to add item(s) to list";
   }
   updateListTimestamp(listId);
-  
 }
 
-export async function editListItem(listItem: ListItemFields, ownerId: string, listId: string, ogName: string) {
-  try{
-    await verifyListOwner(ownerId, listId);    
-    await db.update(listItemTable).set(listItem as any).where(and(
-      eq(listItemTable.listId, listId),
-      eq(listItemTable.name, ogName)
-    ));
+export async function editListItem(itemId: number, listItem: ListItemFields, userId: string, listId: string, owner: boolean = true) {
+  try {
+    if (owner) {
+      await verifyListOwner(userId, listId);  
+    }
+    await db.update(listItemTable).set(listItem as any).where(eq(listItemTable.id, itemId));
   }
   catch(e: any) {
     console.error(e);
@@ -167,13 +169,14 @@ export async function editListItem(listItem: ListItemFields, ownerId: string, li
   updateListTimestamp(listId); 
 }
 
-export async function deleteListItem(ownerId: string, listId: string, itemName: string) {
+export async function deleteListItem(itemId: number, userId: string, listId: string, owner: boolean = true) {
   try {
-    await verifyListOwner(ownerId, listId);
-    await db.delete(listItemTable).where(and(
-      eq(listItemTable.name, itemName),
-      eq(listItemTable.listId, listId)
-    ));
+    if (owner) {
+      await verifyListOwner(userId, listId);
+    }
+    await db.delete(listItemTable).where(
+      eq(listItemTable.id, itemId),
+    );
   }
   catch(e: any) {
     console.error(e);
@@ -182,19 +185,40 @@ export async function deleteListItem(ownerId: string, listId: string, itemName: 
   updateListTimestamp(listId);
 }
 
-export async function toggleDone(listId: string, itemName: string, by: string) {
+export async function toggleDone(itemId: number, by: string) {
   try {
     const item = await db.query.listItemTable.findFirst({
-      where: and(eq(listItemTable.name, itemName), eq(listItemTable.listId, listId)),
-      columns: {done: true}
+      where: eq(listItemTable.id, itemId),
+      columns: {
+        done: true,
+        listId: true,
+        doneBy: true,
+      },
+      with: {
+        list: {
+          columns: {
+            private: true,
+            listType: true
+          }
+        }
+      }
     });
     if (!item) {
       throw "Item not found";
     }
+    if (item.list?.private) {
+      // check for shared list
+      // check for groups  
+    }
     let update: boolean = !item.done;
     let date = null;
     let byUser = null;
-    if (!item.done) {
+    if (item.done) {
+      // unchecking
+      if (item.list?.listType === 'wishlist' && item.doneBy !== by) {
+        throw "Invalid User";
+      }
+    } else {
       date = new Date();
       byUser = by;
     }
@@ -203,36 +227,32 @@ export async function toggleDone(listId: string, itemName: string, by: string) {
       doneBy: byUser,
       dateDone: date
     }).where(
-      and(
-        eq(listItemTable.name, itemName),
-        eq(listItemTable.listId, listId)
-      )
+      eq(listItemTable.id, itemId)
     );
   }
   catch(e: any) {
     console.error(e);
-    throw "Failed to mark as complete/bought"
+    if (typeof e === "string") {
+      throw e;
+    } else {
+      throw "Failed to mark as complete/bought"
+    }
   }
 }
 
-export async function deleteAllDone(listId: string, userId: string, checkShared: boolean = false) {
-  if (checkShared) {
-    // check if the list is shared
-  } else {
-    try {
-      await verifyListOwner(userId, listId);
-    }
-    catch(e: any) {
-      throw e;
-    }
-  }
+export async function deleteAllDone(listId: string, userId: string, owner: boolean = true) {
   try {
+    if (owner) {
+      await verifyListOwner(userId, listId);
+    } else {
+      //check for shared list
+    }
     await db.delete(listItemTable).where(
       and(
         eq(listItemTable.listId, listId),
         eq(listItemTable.done, true)
       )
-    )
+    );
   } catch (e: any) {
     console.error(e);
     throw "Failed to remove group";

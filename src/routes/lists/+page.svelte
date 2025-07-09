@@ -88,9 +88,9 @@
 			<li class="list-row" in:fly={{ y: 20 }} out:slide>
 				<div></div>
 				<div class="flex flex-col justify-center">
-					<div>{list.name}</div>
+					<div class="text-lg">{list.name}</div>
 					{#if list.description}
-						<div class="text-xs font-semibold opacity-60">{list.description}</div>
+						<div class="text-sm font-semibold opacity-60">{list.description}</div>
 					{/if}
 					{#if deleteIndex === list.id}
 						<form
