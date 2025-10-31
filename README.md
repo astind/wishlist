@@ -1,3 +1,9 @@
+# Amazon wishlist replacement.
+
+This project idea was moved to [solid-wishlisth](https://github.com/astind/solid-wishlist).
+I ended up wanting to use Solid.js and SolidStart over Svelte and SvelteKit.
+
+
 # sv
 
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
